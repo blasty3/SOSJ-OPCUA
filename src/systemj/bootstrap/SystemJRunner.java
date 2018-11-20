@@ -59,6 +59,9 @@ public class SystemJRunner
         private static boolean IsSPOTRemoteSOATest = false;
         private static boolean IsSPOTRemoteSOA = false;
         
+        private static boolean IsSOSJOPCUA = false;
+        private static boolean IsSOSJRegOPCUA = false;
+        
         private static String SOSJRegID, SOSJRegAddr,SOSJRegAdvExpiryTime;
         private static String GtwyAddr;
                 private static String SubnetMask;
@@ -296,6 +299,50 @@ public class SystemJRunner
                                 }
                             
                         }
+                        else if(args[i].equals("-sosjopcua")){
+                            IsSOSJOPCUA = true;
+                            
+                            if(args.length>i+1){
+                                    if(args[i+1].equalsIgnoreCase("help")){
+                                        printSOSJNoCDUsage();
+                                        System.exit(1);
+                                    } else {
+                                    GtwyAddr = args[i+1];
+                                    //SubnetMask = args[i+2];
+                                    SSName = args[i+2];
+                                    System.out.println("SS name: " +SSName);
+                                    SOABuffer.AddEmptySSName(SSName);
+                                    SJSSCDSignalChannelMap.addLocalSSName(SSName);
+                                    break;
+                                 }
+                                } else {
+                                    printSOSJNoCDUsage();
+                                    System.exit(1);
+                                }
+                            
+                        }
+                        else if(args[i].equals("-sosjregopcua")){
+                            IsSOSJNoCD = true;
+                            
+                            if(args.length>i+1){
+                                    if(args[i+1].equalsIgnoreCase("help")){
+                                        printSOSJNoCDUsage();
+                                        System.exit(1);
+                                    } else {
+                                    GtwyAddr = args[i+1];
+                                    //SubnetMask = args[i+2];
+                                    SSName = args[i+2];
+                                    System.out.println("SS name: " +SSName);
+                                    SOABuffer.AddEmptySSName(SSName);
+                                    SJSSCDSignalChannelMap.addLocalSSName(SSName);
+                                    break;
+                                 }
+                                } else {
+                                    printSOSJNoCDUsage();
+                                    System.exit(1);
+                                }
+                            
+                        }
                         
 			else{
 				System.out.println("Unrecognized option: "+args[i]);
@@ -312,10 +359,22 @@ public class SystemJRunner
 
             JdomParser parser;
                 
-		if(filename!=null)
-			parser = new JdomParser(filename);
-		else
+		if(filename!=null) {
+			
+			//If using OPC UA
+			
+			if(IsSOSJOPCUA) {
+				
+			} else {
+				parser = new JdomParser(filename);
+			}
+			
+			
+		}
+		else {
 			parser = new JdomParser(filestream);
+		}
+		
 		try{
 			if(genmain_sunspot) {
 				parser.setGenSunspot();
@@ -389,7 +448,6 @@ public class SystemJRunner
                      while (!SJServiceRegistry.getParsingStatus()){
                          
                      }
-                     
                      
                      
                      if(IsSOSJP2P){
@@ -530,6 +588,10 @@ public class SystemJRunner
             //regmsgreceiver.start();
             locregmsgreceiver.start();
             
+        }
+        
+        private static void StartOPC_UA_LDS(){
+                        
         }
         
        // private static void StartSigChanReconfigurator(){

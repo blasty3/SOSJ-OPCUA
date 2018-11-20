@@ -91,12 +91,22 @@ JSONObject stateVarParamsAttrs = new JSONObject();
 JSONObject actionIntf = new JSONObject();
 JSONObject actionIntfTot = new JSONObject();
 
+private boolean IsSOSJOPCUA = false;
+
 //Udayanto modification
 
 public JdomParser(){}
 public JdomParser(String file){
         this.file = file;
         program = new SystemJProgram();
+}
+
+public JdomParser(String file, boolean IsSOSJOPCUA){
+    this.file = file;
+    program = new SystemJProgram();
+    
+    this.IsSOSJOPCUA = IsSOSJOPCUA;
+    
 }
 
 public JdomParser(InputStream iis){
@@ -612,6 +622,7 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
         //allowedValListServ = new JSONObject();
 
         boolean isServices = false;
+        String RegistrationPeriod = "1000"; //some initialization value to avoid NullException being thrown.
         String cdname = cd.getAttributeValue("Name");
         String CDClassName = cd.getAttributeValue("Class");
         if(cd.getAttributeValue("IsServices") != null){
@@ -621,6 +632,20 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
         //else
         //{
             isServices = Boolean.parseBoolean(cd.getAttributeValue("IsServices"));
+        }
+        
+        /*
+         * Udayanto
+         * OPC UA changes
+         */
+        if (IsSOSJOPCUA) {
+        	if(cd.getAttributeValue("RegistrationPeriod") != null){
+        		
+        		RegistrationPeriod = cd.getAttribute("RegistrationPeriod").getValue();
+        	} else {
+        		throw new RuntimeException("CD is OPC UA enabled, but missing 'RegistrationPeriod' parameter ");
+        	}
+        	
         }
         
         if (isServices && cd.getChild("Services")==null){
