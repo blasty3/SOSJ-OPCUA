@@ -363,11 +363,9 @@ public class SystemJRunner
 			
 			//If using OPC UA
 			
-			if(IsSOSJOPCUA) {
-				
-			} else {
-				parser = new JdomParser(filename);
-			}
+			
+				parser = new JdomParser(filename, IsSOSJOPCUA);
+			
 			
 			
 		}

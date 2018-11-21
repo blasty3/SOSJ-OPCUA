@@ -622,7 +622,13 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
         //allowedValListServ = new JSONObject();
 
         boolean isServices = false;
-        String RegistrationPeriod = "1000"; //some initialization value to avoid NullException being thrown.
+        
+        //OPCUA config
+        String RegistrationPeriod = "10000"; //some initialization value to avoid NullException being thrown. //in milliseconds??
+        String Addr = "127.0.0.1"; //some initialization value to avoid NullException being thrown. //localhost by default
+        int BindPort = 4840; //some initialization value  //4840 is usually the port used in OPC UA, but not necessarily this unless it's a discovery server
+        //END OPC UA config
+        
         String cdname = cd.getAttributeValue("Name");
         String CDClassName = cd.getAttributeValue("Class");
         if(cd.getAttributeValue("IsServices") != null){
@@ -642,8 +648,31 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
         	if(cd.getAttributeValue("RegistrationPeriod") != null){
         		
         		RegistrationPeriod = cd.getAttribute("RegistrationPeriod").getValue();
+        		
+        		//Create OPC UA server
+        		
         	} else {
-        		throw new RuntimeException("CD is OPC UA enabled, but missing 'RegistrationPeriod' parameter ");
+        		throw new RuntimeException("CD " +cdname+ " is OPC UA enabled, but missing 'RegistrationPeriod' parameter ");
+        	}
+        	
+        	if(cd.getAttributeValue("Addr") != null){
+        		
+        		Addr = cd.getAttribute("Addr").getValue();
+        		
+        		//Create OPC UA server
+        		
+        	} else {
+        		throw new RuntimeException("CD " +cdname+ " is OPC UA enabled, but missing 'Addr' parameter ");
+        	}
+        	
+        	if(cd.getAttributeValue("BindPort") != null){
+        		
+        	    BindPort = Integer.parseInt(cd.getAttribute("BindPort").getValue());
+        		
+        		//Create OPC UA server
+        		
+        	} else {
+        		throw new RuntimeException("CD " +cdname+ " is OPC UA enabled, but missing 'BindPort' parameter ");
         	}
         	
         }
