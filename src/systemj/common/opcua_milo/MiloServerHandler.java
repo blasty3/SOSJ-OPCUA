@@ -37,11 +37,13 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.eclipse.milo.opcua.sdk.server.api.config.OpcUaServerConfig.USER_TOKEN_POLICY_ANONYMOUS;
 import static org.eclipse.milo.opcua.sdk.server.api.config.OpcUaServerConfig.USER_TOKEN_POLICY_USERNAME;
 
-public class MiloServerHandler implements Runnable{
+//public class MiloServerHandler implements Runnable{
+
+public class MiloServerHandler {
     
     private final OpcUaServer server;
 
-    private MiloServerHandler() throws Exception {
+    public MiloServerHandler() throws Exception {
         CryptoRestrictions.remove();
 
         KeyStoreLoader loader = new KeyStoreLoader().load();
@@ -103,7 +105,7 @@ public class MiloServerHandler implements Runnable{
 
     }
     
-    private MiloServerHandler(String name, String addr, int bindPort ) throws Exception {
+    public MiloServerHandler(String name, String addr, int bindPort) throws Exception {
         CryptoRestrictions.remove();
 
         KeyStoreLoader loader = new KeyStoreLoader().load();
@@ -131,21 +133,21 @@ public class MiloServerHandler implements Runnable{
         });
 
         OpcUaServerConfig serverConfig = OpcUaServerConfig.builder()
-            .setApplicationUri("urn:eclipse:milo:sosjserver:"+name)
-            .setApplicationName(LocalizedText.english("Eclipse Milo SOSJ OPC-UA Server " +name))
+            .setApplicationUri("urn:eclipse:milo:sosjcdserver:"+name)
+            .setApplicationName(LocalizedText.english("Eclipse Milo SOSJ CD OPC-UA Server " +name))
             .setBindAddresses(newArrayList(addr))
             .setBindPort(bindPort) //OPCUA bindPort is often 4840, but this is not required unless for discovery server
             .setBuildInfo(
                 new BuildInfo(
-                    "urn:eclipse:milo:sosj-server-"+name,
+                    "urn:eclipse:milo:sosj-cd-server:"+name,
                     "eclipse",
-                    "eclipse milo sosj server " +name,
+                    "eclipse milo cd sosj server " +name,
                     OpcUaServer.SDK_VERSION,
                     "", DateTime.now()))
             .setCertificateManager(certificateManager)
             .setCertificateValidator(certificateValidator)
             .setIdentityValidator(identityValidator)
-            .setProductUri("urn:eclipse:milo:sosjserver:" +name)
+            .setProductUri("urn:eclipse:milo:sosjcdserver:" +name)
             .setServerName(name)
             .setSecurityPolicies(
                 EnumSet.of(
@@ -157,7 +159,7 @@ public class MiloServerHandler implements Runnable{
                 ImmutableList.of(
                     USER_TOKEN_POLICY_ANONYMOUS,
                     USER_TOKEN_POLICY_USERNAME))
-            .setDiscoveryServerEnabled(false)
+            .setDiscoveryServerEnabled(true)
             .setMulticastEnabled(true)
             .build();
 
@@ -169,15 +171,32 @@ public class MiloServerHandler implements Runnable{
         return server;
     }
 
-    private CompletableFuture<OpcUaServer> startup() {
-        return server.startup();
+    public CompletableFuture<OpcUaServer> startup() {
+    	 return server.startup().whenComplete((opcUaServer, throwable) -> server
+    	            .registerWithDiscoveryServer("opc.tcp://localhost:4840/discovery", null, null));
+    }
+    
+    public CompletableFuture<OpcUaServer> startup(String DiscServAddr) {
+   	 return server.startup().whenComplete((opcUaServer, throwable) -> server
+   	            .registerWithDiscoveryServer("opc.tcp://"+DiscServAddr+":4840/discovery", null, null));
+   }
+
+    public CompletableFuture<OpcUaServer> shutdown() {
+        CompletableFuture<OpcUaServer> done = new CompletableFuture<>();
+        server.unregisterFromDiscoveryServer()
+            .whenComplete((statusCode, throwable) -> server.shutdown().whenComplete((opcUaServer, throwable1) -> {
+                if (opcUaServer != null) {
+                    done.complete(opcUaServer);
+                } else {
+                    done.completeExceptionally(throwable1);
+                }
+            }));
+        return done;
     }
 
-    private CompletableFuture<OpcUaServer> shutdown() {
-        return server.shutdown();
-    }
-
-	@Override
+	
+	/*
+	 @Override
 	public void run() {
 		
 		try {
@@ -201,4 +220,5 @@ public class MiloServerHandler implements Runnable{
 		
 		
 	}
+	*/
 }

@@ -15,20 +15,19 @@ import org.eclipse.milo.opcua.stack.core.types.structured.EndpointDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MiloClientHandler
+public class ClientRunner
 {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private final CompletableFuture<OpcUaClient> future = new CompletableFuture<>();
   private final KeyStoreLoader loader = new KeyStoreLoader();
   private final String endpointUrl;
-  private final IClient uaClient;
+  private final ClientExample uaClient;
 
-  public MiloClientHandler(String endpointUrl, IClient clientExample)
+  public ClientRunner(String endpointUrl, ClientExample clientExample)
   {
     this.endpointUrl = endpointUrl;
     this.uaClient = clientExample;
-    
   }
 
   private OpcUaClient createClient() throws Exception
@@ -51,8 +50,8 @@ public class MiloClientHandler
 
     loader.load();
     OpcUaClientConfig config = OpcUaClientConfig.builder()
-            .setApplicationName(LocalizedText.english("sosj client"))
-            .setApplicationUri("urn:sosj:opcua:client")
+            .setApplicationName(LocalizedText.english("digitalpetri opc-ua client"))
+            .setApplicationUri("urn:digitalpetri:opcua:client")
             .setCertificate(loader.getClientCertificate())
             .setKeyPair(loader.getClientKeyPair())
             .setEndpoint(endpointFinal)

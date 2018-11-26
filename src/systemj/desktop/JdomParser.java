@@ -10,8 +10,11 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.jdom.Attribute;
 import org.jdom.DataConversionException;
 import org.jdom.Document;
@@ -32,6 +35,11 @@ import systemj.common.InterfaceManager;
 import systemj.common.SJSSCDSignalChannelMap;
 import systemj.common.SJServiceRegistry;
 import systemj.common.SOAFacility.Support.SOABuffer;
+import systemj.common.opcua_milo.ClientExampleRunSOSJ;
+import systemj.common.opcua_milo.ClientRunner;
+import systemj.common.opcua_milo.IClient;
+import systemj.common.opcua_milo.MiloServerHandler;
+import systemj.common.opcua_milo.OPCUAClientServerObjRepo;
 import systemj.common.SOAFacility.TCPIPLinkRegistry;
 //import systemj.common.SignalObjBuffer;
 import systemj.interfaces.GenericInterface;
@@ -624,10 +632,11 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
         boolean isServices = false;
         
         //OPCUA config
-        String RegistrationPeriod = "10000"; //some initialization value to avoid NullException being thrown. //in milliseconds??
-        String Addr = "127.0.0.1"; //some initialization value to avoid NullException being thrown. //localhost by default
+        //String RegistrationPeriod = "10000"; //some initialization value to avoid NullException being thrown. //in milliseconds??
+        String OwnAddr = "127.0.0.1"; //some initialization value to avoid NullException being thrown. //localhost by default
         int BindPort = 4840; //some initialization value  //4840 is usually the port used in OPC UA, but not necessarily this unless it's a discovery server
         //END OPC UA config
+        String DiscServAddr = "127.0.0.1"; //some initialization value to avoid NullException being thrown. //localhost by default
         
         String cdname = cd.getAttributeValue("Name");
         String CDClassName = cd.getAttributeValue("Class");
@@ -645,35 +654,99 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
          * OPC UA changes
          */
         if (IsSOSJOPCUA) {
+        	/*
         	if(cd.getAttributeValue("RegistrationPeriod") != null){
         		
         		RegistrationPeriod = cd.getAttribute("RegistrationPeriod").getValue();
         		
-        		//Create OPC UA server
+        		
         		
         	} else {
         		throw new RuntimeException("CD " +cdname+ " is OPC UA enabled, but missing 'RegistrationPeriod' parameter ");
         	}
+        	*/
         	
-        	if(cd.getAttributeValue("Addr") != null){
+        	
+        	
+        	if(cd.getAttributeValue("OwnAddr") != null){
         		
-        		Addr = cd.getAttribute("Addr").getValue();
-        		
-        		//Create OPC UA server
+        		OwnAddr = cd.getAttribute("OwnAddr").getValue();
         		
         	} else {
-        		throw new RuntimeException("CD " +cdname+ " is OPC UA enabled, but missing 'Addr' parameter ");
+        		throw new RuntimeException("CD " +cdname+ " is OPC UA enabled, but missing 'OwnAddr' parameter ");
+        	}
+        	
+        	if(cd.getAttributeValue("DiscServAddr") != null){
+        		
+        		DiscServAddr = cd.getAttribute("DiscServAddr").getValue();
+        		
+        	} else {
+        		throw new RuntimeException("CD " +cdname+ " is OPC UA enabled, but missing 'DiscServAddr' parameter ");
         	}
         	
         	if(cd.getAttributeValue("BindPort") != null){
         		
         	    BindPort = Integer.parseInt(cd.getAttribute("BindPort").getValue());
         		
-        		//Create OPC UA server
+        		
         		
         	} else {
         		throw new RuntimeException("CD " +cdname+ " is OPC UA enabled, but missing 'BindPort' parameter ");
         	}
+        	
+        	
+        	// Create Milo Server
+        	
+        	try {
+        		
+        			
+        			MiloServerHandler milo_server_h = new MiloServerHandler(cdname,OwnAddr,BindPort);
+
+        			milo_server_h.startup(DiscServAddr).get();
+        	        
+        	        OPCUAClientServerObjRepo.AddServerObj(cdname, milo_server_h);
+        	        //final CompletableFuture<Void> future = new CompletableFuture<>();
+
+        	        //Runtime.getRuntime().addShutdownHook(new Thread(() -> server.shutdown().thenRun(() -> future.complete(null))));
+
+        	        //future.get();
+        	        
+        	        
+        			
+        		
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        	
+        	System.out.println("Done creating Milo Server, now Client...");
+        	
+        	
+        	
+        	// Create Milo Client?
+        	
+        	
+        	try {
+        		
+        		ClientExampleRunSOSJ icl = new ClientExampleRunSOSJ();
+    			
+    			ClientRunner client_run = new ClientRunner(endpointUrl, icl);
+    	        
+    	        OPCUAClientServerObjRepo.AddClientObj(cdname, );
+    	        //final CompletableFuture<Void> future = new CompletableFuture<>();
+
+    	        //Runtime.getRuntime().addShutdownHook(new Thread(() -> server.shutdown().thenRun(() -> future.complete(null))));
+
+    	        //future.get();
+    	        
+	    	        
+	    			
+	    		
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        	
         	
         }
         
