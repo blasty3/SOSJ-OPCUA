@@ -34,6 +34,17 @@ import systemj.common.SOAFacility.Support.SOABuffer;
 
 public class RegSender implements Runnable {
 
+	private boolean IsOPCUA = false;
+	
+	public RegSender() {
+		
+	}
+	
+	public RegSender(boolean IsOPCUA) {
+		this.IsOPCUA = IsOPCUA;
+	}
+	
+	
     @Override
     public void run() {
         
@@ -104,18 +115,35 @@ public class RegSender implements Runnable {
                             }
                           
                                 //regular adv
-                            boolean startRegAdv = CheckOwnBeaconAdv();
-                           
-                            if (startRegAdv){
-                              
-                               String AdvMsg = sjdisc.ConstructRegistryReAdvertisementMessage(SOABuffer.getSOSJRegBeaconPeriodTime(), SOABuffer.getSOSJRegID(), SOABuffer.getSOSJRegAddr());
+                            
+                            if(!IsOPCUA) {
+                            	
+                            	 boolean startRegAdv = CheckOwnBeaconAdv();
+                                 
+                                 if (startRegAdv){
+                                   
+                                    String AdvMsg = sjdisc.ConstructRegistryReAdvertisementMessage(SOABuffer.getSOSJRegBeaconPeriodTime(), SOABuffer.getSOSJRegID(), SOABuffer.getSOSJRegAddr());
+                                     
+                                     SendAdvMsg(broadcastAddr, AdvMsg);
+                                     SOABuffer.RecordAdvertisementTimeStamp();
+                                     
+                                 }
+                            	
+                            }
+                            
+                            //end regular adv
+                            
+                            else {
+                            	
+                            	// wait for command to send notification to target
+                            	
+                            	String AdvMsg = sjdisc.ConstructRegistryReAdvertisementMessage(SOABuffer.getSOSJRegBeaconPeriodTime(), SOABuffer.getSOSJRegID(), SOABuffer.getSOSJRegAddr());
                                 
                                 SendAdvMsg(broadcastAddr, AdvMsg);
-                                SOABuffer.RecordAdvertisementTimeStamp();
                                 
+                            	
                             }
-    
-                            //end regular adv
+                            
     
                             //notify all SS with broadcast
                             boolean notify = SOABuffer.GetRegNotify();

@@ -23,11 +23,17 @@ public class ClientRunner
   private final KeyStoreLoader loader = new KeyStoreLoader();
   private final String endpointUrl;
   private final ClientExample uaClient;
+  
+  private OpcUaClient opcuaclient;
+  private String Id;
 
-  public ClientRunner(String endpointUrl, ClientExample clientExample)
+  public ClientRunner(String Addr, int portNum, String Id, ClientExample clientExample)
   {
-    this.endpointUrl = endpointUrl;
+    //this.endpointUrl = endpointUrl;
+	this.endpointUrl = "opc.tcp://"+Addr+":"+portNum+"/"+Id;
+	this.Id = Id;
     this.uaClient = clientExample;
+    
   }
 
   private OpcUaClient createClient() throws Exception
@@ -50,16 +56,18 @@ public class ClientRunner
 
     loader.load();
     OpcUaClientConfig config = OpcUaClientConfig.builder()
-            .setApplicationName(LocalizedText.english("digitalpetri opc-ua client"))
-            .setApplicationUri("urn:digitalpetri:opcua:client")
+            .setApplicationName(LocalizedText.english("SOSJ opc-ua client for " +Id))
+            .setApplicationUri("urn:sosj-opcua:client:" +Id)
             .setCertificate(loader.getClientCertificate())
             .setKeyPair(loader.getClientKeyPair())
             .setEndpoint(endpointFinal)
             .setIdentityProvider(uaClient.getIdentityProvider())
             .setRequestTimeout(uint(30000))
             .build();
+    
+    opcuaclient = new OpcUaClient(config);
 
-    return new OpcUaClient(config);
+    return opcuaclient;
   }
 
   public void run()
@@ -101,5 +109,39 @@ public class ClientRunner
       future.completeExceptionally(t);
     }
   }
+  
+  public OpcUaClient getOpcUaClient() {
+	  return opcuaclient;
+  }
+  
+  public void InstantiateClient() {
+	  future.whenComplete((client, ex)
+	            ->
+	    {
+	      if (client != null)
+	      {
+	        try
+	        {
+	          client.disconnect().get();
+	          Stack.releaseSharedResources();
+	        } catch (InterruptedException | ExecutionException e)
+	        {
+	          logger.error("Error disconnecting:", e.getMessage(), e);
+	        }
+	      } else
+	      {
+	        logger.error("Error running example: {}", ex.getMessage(), ex);
+	        Stack.releaseSharedResources();
+	      }
+	    });
 
-}
+	    try
+	    {
+	      createClient();
+
+	    } catch (Exception t)
+	    {
+	      future.completeExceptionally(t);
+	    }
+	  }
+  }

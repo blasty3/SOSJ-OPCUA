@@ -36,7 +36,7 @@ import systemj.desktop.JdomParser;
 /**
  * SystemJ Runtime Environment - Bootstrap
  * 
- * @author Heejong Park
+ * @author Heejong Park , Udayanto Dwi Atmojo
  * 
  * 
  */
@@ -60,7 +60,7 @@ public class SystemJRunner
         private static boolean IsSPOTRemoteSOA = false;
         
         private static boolean IsSOSJOPCUA = false;
-        private static boolean IsSOSJRegOPCUA = false;
+        private static boolean IsSOSJOPCUALDS = false;
         
         private static String SOSJRegID, SOSJRegAddr,SOSJRegAdvExpiryTime;
         private static String GtwyAddr;
@@ -321,8 +321,8 @@ public class SystemJRunner
                                 }
                             
                         }
-                        else if(args[i].equals("-sosjregopcua")){
-                            IsSOSJNoCD = true;
+                        else if(args[i].equals("-sosjopcualds")){
+                        	IsSOSJOPCUALDS = true;
                             
                             if(args.length>i+1){
                                     if(args[i+1].equalsIgnoreCase("help")){
@@ -363,10 +363,7 @@ public class SystemJRunner
 			
 			//If using OPC UA
 			
-			
 				parser = new JdomParser(filename, IsSOSJOPCUA);
-			
-			
 			
 		}
 		else {
@@ -410,7 +407,19 @@ public class SystemJRunner
                 setSubnetMaskAddr();
                 setRegAdvExpiryTime();
                 StartSOARegThread();
-            } else {
+            } else if(IsSOSJOPCUALDS){
+                setGatewayAddr();
+                //setSubnetMaskAddr();
+                setSOSJRegAddr();
+                setSOSJRegID();
+                setGatewayAddr();
+                setSubnetMaskAddr();
+                StartSOSJThreads(IsSOSJOPCUALDS);
+            
+            } 
+            
+            else
+            {
                 parseXML();
             }
             
@@ -440,13 +449,12 @@ public class SystemJRunner
                 
 		//parseXML();
 
-		if(!genmain){
+                if(!genmain){
                      SJServiceRegistry.setParsingStatus(true);
                      
                      while (!SJServiceRegistry.getParsingStatus()){
                          
                      }
-                     
                      
                      if(IsSOSJP2P){
                          setGatewayAddr();
@@ -460,10 +468,11 @@ public class SystemJRunner
                          StartSOSJThreads();
                      }
                      
+                     
+                     
                      if(IsSOSJNoSO){
                          StartSOSJNoSOThread();
                      }
-                     
                      
                      //StartSigChanReconfigurator();
                      if (genmain_gui){
@@ -474,7 +483,7 @@ public class SystemJRunner
                          StartSPOTRegGatewayThread();
                      }
                      
-                     if(!IsSOSJReg){
+                     if(IsSOSJ || IsSOSJNoCD || IsSOSJP2P || IsSOSJNoSO || IsSOSJOPCUA){
                          program.startProgram();
                      }
                      
@@ -482,6 +491,8 @@ public class SystemJRunner
             }
     
 	}
+	
+	
 	public static void main(InputStream input){
             
             System.out.println("main started with filestream");
@@ -554,6 +565,57 @@ public class SystemJRunner
             
         }
         
+        private static void StartSOSJThreads(boolean IsOPCUA){
+        	
+        	if(IsOPCUA) {
+        		
+        		
+                Thread locmsgreceiver = new Thread(new NoP2PLocalServMessageReceiverThread());
+                Thread msgsender = new Thread(new NoP2PServMessageSenderThread());
+               // Thread migMsgRec = new Thread(new MigrationAndLinkReqMsgRecThread());
+                Thread migLocMsgRec = new Thread(new MigrationAndLinkLocalReqMsgRecThread());
+                //Thread dynCDLocMsgRec = new Thread(new DynamicCDLocalReqReceiverThread());
+                Thread dynCDMsgRec = new Thread(new DynamicCDReqReceiverThread());
+               
+                //expirychecker.start();
+                msgsender.start();
+                //remmsgreceiver.start();
+                locmsgreceiver.start();
+               // migMsgRec.start();
+                migLocMsgRec.start();
+                
+                //dynCDLocMsgRec.start();
+                dynCDMsgRec.start();
+        		
+        		
+        	} else {
+        		
+        		Thread expirychecker = new Thread(new NoP2PServRegExpiryCheckerThread());
+                //Thread remmsgreceiver = new Thread(new NoP2PRemoteServMessageReceiverThread());
+                Thread locmsgreceiver = new Thread(new NoP2PLocalServMessageReceiverThread());
+                Thread msgsender = new Thread(new NoP2PServMessageSenderThread());
+               // Thread migMsgRec = new Thread(new MigrationAndLinkReqMsgRecThread());
+                Thread migLocMsgRec = new Thread(new MigrationAndLinkLocalReqMsgRecThread());
+                //Thread dynCDLocMsgRec = new Thread(new DynamicCDLocalReqReceiverThread());
+                Thread dynCDMsgRec = new Thread(new DynamicCDReqReceiverThread());
+               
+                expirychecker.start();
+                msgsender.start();
+                //remmsgreceiver.start();
+                locmsgreceiver.start();
+               // migMsgRec.start();
+                migLocMsgRec.start();
+                
+                //dynCDLocMsgRec.start();
+                dynCDMsgRec.start();
+        		
+        		
+        	}
+        	
+            
+            
+        }
+        
         private static void StartSOSJNoSOThread(){
             //Thread migMsgRec = new Thread(new MigrationAndLinkReqMsgRecThread());
             //Thread migLocMsgRec = new Thread(new MigrationAndLinkLocalReqMsgRecThread());
@@ -589,7 +651,9 @@ public class SystemJRunner
         }
         
         private static void StartOPC_UA_LDS(){
-                        
+        	Thread locregmsgreceiver = new Thread(new RegReceiver());
+        	Thread regmsgsender = new Thread(new RegSender());
+        	
         }
         
        // private static void StartSigChanReconfigurator(){

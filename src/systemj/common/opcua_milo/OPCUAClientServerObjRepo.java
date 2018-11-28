@@ -17,9 +17,9 @@ public class OPCUAClientServerObjRepo {
 	
 	
 	
-	public static void AddClientObj(String CLName,OpcUaClient OPCUAClientObj){
+	public static void AddClientObj(String CLName, ClientRunner OPCUAClientRunnerObj){
         synchronized(OpcUaClientsLock){
-        	OpcUaClients.put(CLName, OPCUAClientObj);
+        	OpcUaClients.put(CLName, OPCUAClientRunnerObj);
         }
     }
 	

@@ -37,7 +37,7 @@ import systemj.common.SJServiceRegistry;
 import systemj.common.SOAFacility.Support.SOABuffer;
 import systemj.common.opcua_milo.ClientExampleRunSOSJ;
 import systemj.common.opcua_milo.ClientRunner;
-import systemj.common.opcua_milo.IClient;
+import systemj.common.opcua_milo.ClientExample;
 import systemj.common.opcua_milo.MiloServerHandler;
 import systemj.common.opcua_milo.OPCUAClientServerObjRepo;
 import systemj.common.SOAFacility.TCPIPLinkRegistry;
@@ -635,9 +635,11 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
         //String RegistrationPeriod = "10000"; //some initialization value to avoid NullException being thrown. //in milliseconds??
         String OwnAddr = "127.0.0.1"; //some initialization value to avoid NullException being thrown. //localhost by default
         int BindPort = 4840; //some initialization value  //4840 is usually the port used in OPC UA, but not necessarily this unless it's a discovery server
-        //END OPC UA config
-        String DiscServAddr = "127.0.0.1"; //some initialization value to avoid NullException being thrown. //localhost by default
         
+        String DiscServAddr = "127.0.0.1"; //some initialization value to avoid NullException being thrown. //localhost by default
+        int ClPort = 2345;
+        
+        //END OPC UA config
         String cdname = cd.getAttributeValue("Name");
         String CDClassName = cd.getAttributeValue("Class");
         if(cd.getAttributeValue("IsServices") != null){
@@ -688,10 +690,16 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
         		
         	    BindPort = Integer.parseInt(cd.getAttribute("BindPort").getValue());
         		
-        		
-        		
         	} else {
         		throw new RuntimeException("CD " +cdname+ " is OPC UA enabled, but missing 'BindPort' parameter ");
+        	}
+        	
+        	if(cd.getAttributeValue("ClPort") != null){
+        		
+        	    ClPort = Integer.parseInt(cd.getAttribute("ClPort").getValue());
+        		
+        	} else {
+        		throw new RuntimeException("CD " +cdname+ " is OPC UA enabled, but missing 'ClPort' parameter ");
         	}
         	
         	
@@ -724,24 +732,23 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
         	
         	
         	// Create Milo Client?
-        	
+        	ClientRunner clrun;
         	
         	try {
         		
         		ClientExampleRunSOSJ icl = new ClientExampleRunSOSJ();
     			
-    			ClientRunner client_run = new ClientRunner(endpointUrl, icl);
-    	        
-    	        OPCUAClientServerObjRepo.AddClientObj(cdname, );
+    			clrun = new ClientRunner(OwnAddr, ClPort, cdname, icl);
+    			
+    			clrun.InstantiateClient();
+    			
+    	        OPCUAClientServerObjRepo.AddClientObj(cdname, clrun);
     	        //final CompletableFuture<Void> future = new CompletableFuture<>();
 
     	        //Runtime.getRuntime().addShutdownHook(new Thread(() -> server.shutdown().thenRun(() -> future.complete(null))));
 
     	        //future.get();
     	        
-	    	        
-	    			
-	    		
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
