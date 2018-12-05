@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutionException;
 import org.eclipse.milo.examples.server.KeyStoreLoader;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.sdk.client.api.config.OpcUaClientConfig;
+import org.eclipse.milo.opcua.sdk.client.api.identity.AnonymousProvider;
 import org.eclipse.milo.opcua.stack.client.UaTcpStackClient;
 import org.eclipse.milo.opcua.stack.core.Stack;
 import org.eclipse.milo.opcua.stack.core.security.SecurityPolicy;
@@ -61,7 +62,8 @@ public class OPCUAClientManager
             .setCertificate(loader.getClientCertificate())
             .setKeyPair(loader.getClientKeyPair())
             .setEndpoint(endpointFinal)
-            .setIdentityProvider(uaClient.getIdentityProvider())
+            //.setIdentityProvider(uaClient.getIdentityProvider())
+            .setIdentityProvider(new AnonymousProvider())
             .setRequestTimeout(uint(30000))
             .build();
 

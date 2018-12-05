@@ -22,9 +22,9 @@ public class MiloClientHandler
   private final CompletableFuture<OpcUaClient> future = new CompletableFuture<>();
   private final KeyStoreLoader loader = new KeyStoreLoader();
   private final String endpointUrl;
-  private final IClient uaClient;
+  private final ClientExample uaClient;
 
-  public MiloClientHandler(String endpointUrl, IClient clientExample)
+  public MiloClientHandler(String endpointUrl, ClientExample clientExample)
   {
     this.endpointUrl = endpointUrl;
     this.uaClient = clientExample;

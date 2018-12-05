@@ -33,7 +33,7 @@ import systemj.interfaces.Scheduler;
  * SystemJ program
  * Must be compatible with CLDC 1.1
  * 
- * @author hpar081
+ * @author hpar081, udayanto dwi atmojo
  *
  */
 public class SystemJProgram {

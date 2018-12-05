@@ -16,6 +16,9 @@ import systemj.common.SOAFacility.Support.SOABuffer;
 public class SJServiceRegistry {
    
     private static JSONObject currentServiceRegistry = new JSONObject();
+    
+    
+    private static JSONObject currentCD_OPC_UA_Registry = new JSONObject();
 
     private static JSONObject serviceExpiryLength = new JSONObject();
     private final static Object ServExpiryLengthLock = new Object();
@@ -23,6 +26,8 @@ public class SJServiceRegistry {
     private final static Object serviceAdvertisementReceivedTimeLock = new Object();
     
     private final static Object CurrentRegistryLock = new Object();
+    
+    private final static Object CurrentCD_OPC_UA_RegistryLock = new Object();
 
     
     //private final static Object RegistryParsingStatLock=new Object();
@@ -33,6 +38,85 @@ public class SJServiceRegistry {
             
             synchronized (CurrentRegistryLock){
                 currentServiceRegistry.put(SJSSCDSignalChannelMap.getLocalSSName(),js);
+            }
+          
+        //} 
+    }
+    
+    public static void AddOPCUAServerToRegistryApplicationDescription(String ServerName, String ApplicationURI, String ApplicationName, String ProductURI, String ApplicationType, String[] DiscoveryURLs) throws JSONException{
+        
+        //if (IsInternalServ){
+            
+            synchronized (CurrentCD_OPC_UA_RegistryLock){
+            	
+            	if(currentCD_OPC_UA_Registry.has(ServerName)) {
+            		
+            		
+       
+            	} else {
+            		JSONObject jsChild = new JSONObject();
+            		JSONObject jsDiscUrls = new JSONObject();
+            		
+            		if (DiscoveryURLs != null) {
+                        //logger.info("\tDiscovery URLs:");
+            			int index = 0;
+                        for (String url : DiscoveryURLs) {
+                          //  logger.info("\t\t" + url);
+                        	jsDiscUrls.put(Integer.toString(index), url);
+                        	index++;
+                        }
+                    }
+            		
+                	jsChild.put("ApplicationURI", ApplicationURI);
+                	jsChild.put("ApplicationName", ApplicationName);
+                	jsChild.put("ProductURI", ProductURI);
+                	jsChild.put("ApplicationType", ApplicationType);
+                	jsChild.put("DiscoveryURLs", jsDiscUrls);
+                	
+                	currentCD_OPC_UA_Registry.put(ServerName,jsChild);
+            	}
+            	
+            	
+            }
+          
+        //} 
+    }
+    
+    public static void AddOPCUAServerToRegistryServerNetwork(String ServerName, String RecordID, String DiscoveryURL, String[] Capabilities) throws JSONException{
+        
+        //if (IsInternalServ){
+            
+            synchronized (CurrentCD_OPC_UA_RegistryLock){
+            	
+            	if(currentCD_OPC_UA_Registry.has(ServerName)) {
+            		
+            	} else {
+            		
+            		JSONObject jsChild = new JSONObject();
+            		JSONObject jsCapabilities = new JSONObject();
+            		
+            		if (Capabilities != null) {
+                        //logger.info("\tDiscovery URLs:");
+            			int index = 0;
+                        for (String capability : Capabilities) {
+                          //  logger.info("\t\t" + url);
+                        	jsCapabilities.put(Integer.toString(index), capability);
+                        	index++;
+                        }
+                    }
+            		
+                	jsChild.put("RecordID", RecordID);
+                	jsChild.put("DiscoveryURL", DiscoveryURL);
+                	
+                	jsChild.put("Capabilities", jsCapabilities);
+                	
+                	currentCD_OPC_UA_Registry.put(ServerName,jsChild);
+                	
+                	
+            		
+            	}
+            	
+            	
             }
           
         //} 

@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * SystemJ program class </p>
  *
- * @Modified_by Heejong Park
+ * @Modified_by Heejong Park and Udayanto Dwi Atmojo
  */
 public abstract class ClockDomain implements Runnable,Serializable
 {

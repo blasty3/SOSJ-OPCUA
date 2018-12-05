@@ -30,7 +30,11 @@ import systemj.common.SOAFacility.RegSender;
 //import systemj.common.SOAFacility.RegRemoteDiscMessageReceiverThread;
 //import systemj.common.SOAFacility.RegRemoteMessageReceiverThread;
 import systemj.common.SOAFacility.Support.SOABuffer;
+import systemj.common.opcua_milo.FindServersClient;
 import systemj.desktop.JdomParser;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 
 /**
@@ -70,6 +74,8 @@ public class SystemJRunner
         private static boolean IsSpotRegOnly = false;
         private static boolean IsSpotReg = false;
         private static String genplatform;
+        
+        private static ScheduledExecutorService periodicFindServerQuery;
         
 	
 	private static void printInfo(){
@@ -414,7 +420,7 @@ public class SystemJRunner
                 setSOSJRegID();
                 setGatewayAddr();
                 setSubnetMaskAddr();
-                StartSOSJThreads(IsSOSJOPCUALDS);
+                StartOPC_UA_LDS();
             
             } 
             
@@ -654,6 +660,18 @@ public class SystemJRunner
         	Thread locregmsgreceiver = new Thread(new RegReceiver());
         	Thread regmsgsender = new Thread(new RegSender());
         	
+        	//need to start timer to regularly trigger FindServer in LDS
+        	
+        	periodicFindServerQuery = Executors.newScheduledThreadPool(2);
+        	
+        	FindServersClient findServCl = new FindServersClient();
+        	
+        	// periodic execution to check if there are new devices
+        	
+        	periodicFindServerQuery.scheduleWithFixedDelay
+        	
+        	// create an OPC UA client to trigger FindServer
+        	
         }
         
        // private static void StartSigChanReconfigurator(){
@@ -668,6 +686,18 @@ public class SystemJRunner
         
         private static void SetSSName(){
             
+        }
+        
+        private class PeriodicFindServerQuery implements Runnable {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			
+        	
         }
         
        // private static void StartSOAGUI(){
