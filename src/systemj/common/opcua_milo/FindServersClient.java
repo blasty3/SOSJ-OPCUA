@@ -34,12 +34,15 @@ import org.eclipse.milo.opcua.stack.core.types.structured.FindServersRequest;
 import org.eclipse.milo.opcua.stack.core.types.structured.FindServersResponse;
 import org.eclipse.milo.opcua.stack.core.types.structured.RequestHeader;
 import org.eclipse.milo.opcua.stack.core.types.structured.ServerOnNetwork;
+import org.json.me.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.uint;
 
-public class FindServersClient implements Runnable{
+import systemj.common.SJServiceRegistry;
+
+public class FindServersClient {
 
     private final AtomicLong requestHandle = new AtomicLong(1L);
 
@@ -58,13 +61,9 @@ public class FindServersClient implements Runnable{
     }
     */
     
-    @Override
-	public void run() {
-		// TODO Auto-generated method stub
-		
-	}
+    
 
-    private UaTcpStackClient getClient(String endpointUrl) {
+    public UaTcpStackClient getClient(String endpointUrl) {
         KeyStoreLoader loader;
         try {
             loader = new KeyStoreLoader().load();
@@ -98,6 +97,7 @@ public class FindServersClient implements Runnable{
                 logger.info("\tRecordID: " + sn.getRecordId());
                 logger.info("\tDiscovery URL: " + sn.getDiscoveryUrl());
                 StringBuilder caps = new StringBuilder();
+                
                 caps.append("\tCapabilities: ");
                 if (sn.getServerCapabilities() != null) {
                     for (String cap : sn.getServerCapabilities()) {
@@ -105,6 +105,15 @@ public class FindServersClient implements Runnable{
                     }
                 }
                 logger.info(caps.toString());
+                
+                /*
+                try {
+					SJServiceRegistry.AddOPCUAServerToRegistryServerNetwork(sn.getServerName(), sn.getRecordId().toString(), sn.getDiscoveryUrl(), sn.getServerCapabilities());
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+                */
             }
             finished.complete(null);
         });
@@ -170,7 +179,18 @@ public class FindServersClient implements Runnable{
                     e.printStackTrace();
                 }
                 logger.info("---");
+                
+                try {
+					SJServiceRegistry.AddOPCUAServerToRegistryApplicationDescription(ad.getApplicationUri(), ad.getApplicationName().toString(), ad.getProductUri(), ad.getApplicationType().toString(), ad.getDiscoveryUrls());
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+                
             }
+            
+            Vector 
+            
             finished.complete(null);
         });
 

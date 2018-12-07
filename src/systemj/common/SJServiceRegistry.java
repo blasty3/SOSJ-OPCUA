@@ -9,6 +9,7 @@ package systemj.common;
 //import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import org.json.me.*;
 import systemj.common.SOAFacility.Support.SOABuffer;
@@ -16,6 +17,7 @@ import systemj.common.SOAFacility.Support.SOABuffer;
 public class SJServiceRegistry {
    
     private static JSONObject currentServiceRegistry = new JSONObject();
+    
     
     
     private static JSONObject currentCD_OPC_UA_Registry = new JSONObject();
@@ -28,6 +30,10 @@ public class SJServiceRegistry {
     private final static Object CurrentRegistryLock = new Object();
     
     private final static Object CurrentCD_OPC_UA_RegistryLock = new Object();
+    
+    
+    private static Vector newServers = new Vector();
+    private final static Object newServersLock = new Object();
 
     
     //private final static Object RegistryParsingStatLock=new Object();
@@ -43,13 +49,13 @@ public class SJServiceRegistry {
         //} 
     }
     
-    public static void AddOPCUAServerToRegistryApplicationDescription(String ServerName, String ApplicationURI, String ApplicationName, String ProductURI, String ApplicationType, String[] DiscoveryURLs) throws JSONException{
+    public static void AddOPCUAServerToRegistryApplicationDescription(String ApplicationURI, String ApplicationName, String ProductURI, String ApplicationType, String[] DiscoveryURLs) throws JSONException{
         
         //if (IsInternalServ){
             
             synchronized (CurrentCD_OPC_UA_RegistryLock){
             	
-            	if(currentCD_OPC_UA_Registry.has(ServerName)) {
+            	if(currentCD_OPC_UA_Registry.has(ApplicationURI)) {
             		
             		
        
@@ -73,13 +79,24 @@ public class SJServiceRegistry {
                 	jsChild.put("ApplicationType", ApplicationType);
                 	jsChild.put("DiscoveryURLs", jsDiscUrls);
                 	
-                	currentCD_OPC_UA_Registry.put(ServerName,jsChild);
+                	currentCD_OPC_UA_Registry.put(ApplicationURI,jsChild);
+                	
+                	newServers.addElement(ApplicationURI);
+                	
             	}
             	
             	
             }
           
         //} 
+    }
+    
+    public static Vector GetNewServers() {
+    	return newServers;
+    }
+    
+    public static void ClearNewServersList() {
+    	newServers.clear();
     }
     
     public static void AddOPCUAServerToRegistryServerNetwork(String ServerName, String RecordID, String DiscoveryURL, String[] Capabilities) throws JSONException{
@@ -89,6 +106,8 @@ public class SJServiceRegistry {
             synchronized (CurrentCD_OPC_UA_RegistryLock){
             	
             	if(currentCD_OPC_UA_Registry.has(ServerName)) {
+            		
+            		
             		
             	} else {
             		

@@ -3,6 +3,7 @@ package systemj.bootstrap;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,8 +34,10 @@ import systemj.common.SOAFacility.Support.SOABuffer;
 import systemj.common.opcua_milo.FindServersClient;
 import systemj.desktop.JdomParser;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -66,6 +69,8 @@ public class SystemJRunner
         private static boolean IsSOSJOPCUA = false;
         private static boolean IsSOSJOPCUALDS = false;
         
+        
+        
         private static String SOSJRegID, SOSJRegAddr,SOSJRegAdvExpiryTime;
         private static String GtwyAddr;
                 private static String SubnetMask;
@@ -75,7 +80,9 @@ public class SystemJRunner
         private static boolean IsSpotReg = false;
         private static String genplatform;
         
-        private static ScheduledExecutorService periodicFindServerQuery;
+        private static ScheduledExecutorService periodicFindServerQueryExec;
+        
+        public static String LDS_ADDR="localhost";
         
 	
 	private static void printInfo(){
@@ -335,12 +342,12 @@ public class SystemJRunner
                                         printSOSJNoCDUsage();
                                         System.exit(1);
                                     } else {
-                                    GtwyAddr = args[i+1];
+                                    LDS_ADDR = args[i+1];
                                     //SubnetMask = args[i+2];
-                                    SSName = args[i+2];
-                                    System.out.println("SS name: " +SSName);
-                                    SOABuffer.AddEmptySSName(SSName);
-                                    SJSSCDSignalChannelMap.addLocalSSName(SSName);
+                                    //SSName = args[i+2];
+                                    //System.out.println("SS name: " +SSName);
+                                    //SOABuffer.AddEmptySSName(SSName);
+                                    //SJSSCDSignalChannelMap.addLocalSSName(SSName);
                                     break;
                                  }
                                 } else {
@@ -662,13 +669,40 @@ public class SystemJRunner
         	
         	//need to start timer to regularly trigger FindServer in LDS
         	
-        	periodicFindServerQuery = Executors.newScheduledThreadPool(2);
+        	periodicFindServerQueryExec = Executors.newScheduledThreadPool(2);
         	
-        	FindServersClient findServCl = new FindServersClient();
+        	
+        	TimerTask periodServ = new TimerTask() {
+
+            	//private String LDS_Addr = "localhost";
+            	
+    			public void run() {
+    				// TODO Auto-generated method stub
+    				
+    				FindServersClient findServCl = new FindServersClient();
+    				
+    				try {
+    					findServCl.outputFindServersOnNetwork("opc.tcp://"+LDS_ADDR+":4840/discovery")
+    					      .thenCompose(aVoid -> findServCl.outputFindServers("opc.tcp://"+LDS_ADDR+":4840/discovery"))
+    					.get();
+    				} catch (InterruptedException e) {
+    					// TODO Auto-generated catch block
+    					e.printStackTrace();
+    				} catch (ExecutionException e) {
+    					// TODO Auto-generated catch block
+    					e.printStackTrace();
+    				}
+    				
+    				
+    			}
+    			
+            };
+        	
+           
         	
         	// periodic execution to check if there are new devices
         	
-        	periodicFindServerQuery.scheduleWithFixedDelay
+        	periodicFindServerQueryExec.scheduleAtFixedRate(periodServ,2, 60, TimeUnit.SECONDS);
         	
         	// create an OPC UA client to trigger FindServer
         	
@@ -688,17 +722,42 @@ public class SystemJRunner
             
         }
         
+        /*
         private class PeriodicFindServerQuery implements Runnable {
 
+        	private String LDS_Addr = "localhost";
+        	
+        	public void init(String LDS_Addr) {
+				// TODO Auto-generated constructor stub
+        		this.LDS_Addr = LDS_Addr;
+        		
+			}
+        	
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
+				
+				FindServersClient findServCl = new FindServersClient();
+				
+				try {
+					findServCl.outputFindServersOnNetwork("opc.tcp://"+LDS_Addr+":4840/discovery")
+					      .thenCompose(aVoid -> findServCl.outputFindServers("opc.tcp://"+LDS_Addr+":4840/discovery"))
+					.get();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 				
 			}
 			
 			
         	
         }
+        */
         
        // private static void StartSOAGUI(){
        //     Thread gui = new Thread(new SOSJGUI()); 
