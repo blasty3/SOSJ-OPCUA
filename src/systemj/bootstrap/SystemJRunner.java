@@ -324,14 +324,15 @@ public class SystemJRunner
                                         printSOSJNoCDUsage();
                                         System.exit(1);
                                     } else {
+                                    	//here
                                     GtwyAddr = args[i+1];
                                     //SubnetMask = args[i+2];
-                                    SSName = args[i+2];
-                                    System.out.println("SS name: " +SSName);
-                                    SOABuffer.AddEmptySSName(SSName);
-                                    SJSSCDSignalChannelMap.addLocalSSName(SSName);
+                                    //SSName = args[i+2];
+                                    //System.out.println("SS name: " +SSName);
+                                    //SOABuffer.AddEmptySSName(SSName);
+                                    //SJSSCDSignalChannelMap.addLocalSSName(SSName);
                                     break;
-                                 }
+                                  }
                                 } else {
                                     printSOSJNoCDUsage();
                                     System.exit(1);
@@ -484,7 +485,6 @@ public class SystemJRunner
                          //setSubnetMaskAddr();
                          StartSOSJThreads();
                      }
-                     
                      
                      
                      if(IsSOSJNoSO){

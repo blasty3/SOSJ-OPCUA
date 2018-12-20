@@ -115,11 +115,11 @@ public class MiloServerSSHandler {
     public MiloServerSSHandler(String name, String addr, int SSPort) throws Exception {
         CryptoRestrictions.remove();
 
-        KeyStoreLoader loader = new KeyStoreLoader().load();
+        //KeyStoreLoader loader = new KeyStoreLoader().load();
 
         DefaultCertificateManager certificateManager = new DefaultCertificateManager(
-            loader.getServerKeyPair(),
-            loader.getServerCertificate()
+       //     loader.getServerKeyPair(),
+        //    loader.getServerCertificate()
         );
 
         File securityTempDir = new File(System.getProperty("java.io.tmpdir"), "security");

@@ -806,7 +806,7 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
      			
      			MiloServerCDHandler milo_server_h_cd = new MiloServerCDHandler(cdname,OwnAddr,BindPort);
 
-     			//milo_server_h_cd.startup(DiscServAddr).get();
+     			milo_server_h_cd.startup(DiscServAddr).get();
      	        
      	        OPCUAClientServerObjRepo.AddServerObjCD(cdname, milo_server_h_cd);
      	        //final CompletableFuture<Void> future = new CompletableFuture<>();
