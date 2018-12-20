@@ -499,8 +499,8 @@ public void parseSubSystem(Element subsystem, InterfaceManager im){
      	        
      	        OPCUAClientServerObjRepo.AddServerObjSS(ssname, milo_server_h);
      	        //final CompletableFuture<Void> future = new CompletableFuture<>();
-
-     	        //Runtime.getRuntime().addShutdownHook(new Thread(() -> server.shutdown().thenRun(() -> future.complete(null))));
+     	        final CompletableFuture<Void> future = new CompletableFuture<>();
+     	        Runtime.getRuntime().addShutdownHook(new Thread(() -> milo_server_h.getServer().shutdown().thenRun(() -> future.complete(null))));
 
      	        //future.get();
      	        

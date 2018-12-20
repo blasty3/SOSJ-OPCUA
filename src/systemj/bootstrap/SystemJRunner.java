@@ -35,6 +35,7 @@ import systemj.common.SOAFacility.Support.SOABuffer;
 import systemj.common.opcua_milo.ClientRequestServiceDescriptionRunner;
 import systemj.common.opcua_milo.FindServersClient;
 import systemj.common.opcua_milo.InvokeGetServiceDescription;
+import systemj.common.opcua_milo.MiloServerSSHandler;
 import systemj.desktop.JdomParser;
 
 import java.util.concurrent.CompletableFuture;
@@ -141,6 +142,16 @@ public class SystemJRunner
 		//System.out.println("\t-x\t\tgenerate bootstrap file");
 		//System.out.println("\t-xsp\t\tgenerate bootstrap file for sunspot");
 	}
+        
+        private static void printSOSJOPCUATestUsage(){
+            System.out.println("SOSJ (SOA + SystemJ) using OPC-UA Discovery, by Udayanto Dwi Atmojo, Dept Electrical Engineering and Automation, Aalto University");
+	System.out.println("Usage: 1st arg - OPC UA Milo LDS Address. ");
+	//System.out.println();
+	//System.out.println("Options:");
+	//System.out.println("\t-version\tprint version");
+	//System.out.println("\t-x\t\tgenerate bootstrap file");
+	//System.out.println("\t-xsp\t\tgenerate bootstrap file for sunspot");
+}
         
 	private static boolean parseOption(String[] args){
 		if(args.length == 0){
@@ -357,6 +368,47 @@ public class SystemJRunner
                                  }
                                 } else {
                                     printSOSJNoCDUsage();
+                                    System.exit(1);
+                                }
+                            
+                        } else if(args[i].equals("-sosjopcuatest")){
+                            //IsSOSJOPCUA = true;
+                            
+                            if(args.length>i+1){
+                                    if(args[i+1].equalsIgnoreCase("help")){
+                                    	printSOSJOPCUATestUsage();
+                                        System.exit(1);
+                                    } else {
+                                    	
+                             			try {
+                             				MiloServerSSHandler milo_server_h = new MiloServerSSHandler("testSS","127.0.0.1",4840);
+											milo_server_h.startup(args[i+1]).get();
+											
+											final CompletableFuture<Void> future = new CompletableFuture<>();
+							     	        Runtime.getRuntime().addShutdownHook(new Thread(() -> milo_server_h.getServer().shutdown().thenRun(() -> future.complete(null))));
+											
+										} catch (InterruptedException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (ExecutionException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} catch (Exception e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+                                    	
+                                    	//here
+                                    //GtwyAddr = args[i+1];
+                                    //SubnetMask = args[i+2];
+                                    //SSName = args[i+2];
+                                    //System.out.println("SS name: " +SSName);
+                                    //SOABuffer.AddEmptySSName(SSName);
+                                    //SJSSCDSignalChannelMap.addLocalSSName(SSName);
+                                    break;
+                                  }
+                                } else {
+                                	printSOSJOPCUATestUsage();
                                     System.exit(1);
                                 }
                             
