@@ -335,7 +335,7 @@ public Element makeMap(List<Element> el, InterfaceManager im){
         return localsub;
 }
 
-public void constructMap(Element el, String ssname, InterfaceManager im){
+    public void constructMap(Element el, String ssname, InterfaceManager im){
     
         
         if(el.getName().equals("ClockDomain")){
@@ -373,12 +373,12 @@ public void parseSubSystem(Element subsystem, InterfaceManager im){
         //OPCUA config
         //String RegistrationPeriod = "10000"; //some initialization value to avoid NullException being thrown. //in milliseconds??
         String OwnAddr = "127.0.0.1"; //some initialization value to avoid NullException being thrown. //localhost by default
-        int BindPort = 4840; //some initialization value  //4840 is usually the port used in OPC UA, but not necessarily this unless it's a discovery server
+        //int BindPort = 4840; //some initialization value  //4840 is usually the port used in OPC UA, but not necessarily this unless it's a discovery server
         
         String DiscServAddr = "127.0.0.1"; //some initialization value to avoid NullException being thrown. //localhost by default
-        int ClPort = 2345;
+        //int ClPort = 2345;
         
-        int SSPort = 2346;
+        int SSPort = 4840;
         
         //END OPC UA config
         
@@ -402,22 +402,6 @@ public void parseSubSystem(Element subsystem, InterfaceManager im){
     		throw new RuntimeException("SS " +ssname+ " is OPC UA enabled, but missing 'DiscServAddr' parameter ");
     	}
     	
-    	if(subsystem.getAttributeValue("BindPort") != null){
-    		
-    	    BindPort = Integer.parseInt(subsystem.getAttribute("BindPort").getValue());
-    		
-    	} else {
-    		throw new RuntimeException("SS " +ssname+ " is OPC UA enabled, but missing 'BindPort' parameter ");
-    	}
-    	
-    	if(subsystem.getAttributeValue("ClPort") != null){
-    		
-    	    ClPort = Integer.parseInt(subsystem.getAttribute("ClPort").getValue());
-    		
-    	} else {
-    		throw new RuntimeException("SS " +subsystem+ " is OPC UA enabled, but missing 'ClPort' parameter ");
-    	}
-    	
     	if(subsystem.getAttributeValue("SSPort") != null){
     		
     	    SSPort = Integer.parseInt(subsystem.getAttribute("SSPort").getValue());
@@ -425,6 +409,29 @@ public void parseSubSystem(Element subsystem, InterfaceManager im){
     	} else {
     		throw new RuntimeException("SS " +subsystem+ " is OPC UA enabled, but missing 'SSPort' parameter ");
     	}
+    	
+    	/*
+    	 
+    	  if(subsystem.getAttributeValue("BindPort") != null){
+    		
+    	    BindPort = Integer.parseInt(subsystem.getAttribute("BindPort").getValue());
+    		
+	    	} else {
+	    		throw new RuntimeException("SS " +ssname+ " is OPC UA enabled, but missing 'BindPort' parameter ");
+	    	}
+    	 
+    	 */
+    	
+    	/*
+    	if(subsystem.getAttributeValue("ClPort") != null){
+    		
+    	    ClPort = Integer.parseInt(subsystem.getAttribute("ClPort").getValue());
+    		
+    	} else {
+    		throw new RuntimeException("SS " +subsystem+ " is OPC UA enabled, but missing 'ClPort' parameter ");
+    	}
+    	*/
+    	
     	
     	// OPC UA parameters END
         
@@ -479,7 +486,6 @@ public void parseSubSystem(Element subsystem, InterfaceManager im){
             }
           }
          
-         
       // OPC UA Server for SS START
          
       // Create Milo Server
@@ -487,7 +493,7 @@ public void parseSubSystem(Element subsystem, InterfaceManager im){
      	try {
      		
      			
-     			MiloServerSSHandler milo_server_h = new MiloServerSSHandler(ssname,OwnAddr,BindPort,SSPort);
+     			MiloServerSSHandler milo_server_h = new MiloServerSSHandler(ssname,OwnAddr,SSPort);
 
      			milo_server_h.startup(DiscServAddr).get();
      	        
@@ -727,7 +733,7 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
         int BindPort = 4840; //some initialization value  //4840 is usually the port used in OPC UA, but not necessarily this unless it's a discovery server
         
         String DiscServAddr = "127.0.0.1"; //some initialization value to avoid NullException being thrown. //localhost by default
-        //int ClPort = 2345;
+        int ClPort = 2345;
         
         //END OPC UA config
         
@@ -784,7 +790,7 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
         		throw new RuntimeException("SS " +ssname+ " is OPC UA enabled, but missing 'BindPort' parameter ");
         	}
         	
-        	/*
+        	
         	if(cd.getAttributeValue("ClPort") != null){
         		
         	    ClPort = Integer.parseInt(cd.getAttribute("ClPort").getValue());
@@ -792,7 +798,7 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
         	} else {
         		throw new RuntimeException("CD " +cdname+ " is OPC UA enabled, but missing 'ClPort' parameter ");
         	}
-        	*/
+        	
         	
         	
         	try {
@@ -819,7 +825,7 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
         	
         	// Create Milo Client?
         	
-        	/*
+        	
         	ClientRunner clrun;
         	
         	try {
@@ -841,7 +847,7 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-        	*/
+        	
         	
         }
         
@@ -887,9 +893,7 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
                      
 
                      for (Attribute SOAAttribute : SOAAttributes){
-                         
-                         
-                         
+                       
                        try {
                             localServAttr.put(SOAAttribute.getName(), SOAAttribute.getValue());
                             mp.println("localServAttr.put(\""+SOAAttribute.getName()+"\",\""+SOAAttribute.getValue()+"\");\n");

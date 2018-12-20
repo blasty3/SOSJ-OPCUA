@@ -112,7 +112,7 @@ public class MiloServerSSHandler {
 
     }
     
-    public MiloServerSSHandler(String name, String addr, int bindPort, int SSPort) throws Exception {
+    public MiloServerSSHandler(String name, String addr, int SSPort) throws Exception {
         CryptoRestrictions.remove();
 
         KeyStoreLoader loader = new KeyStoreLoader().load();
@@ -143,7 +143,7 @@ public class MiloServerSSHandler {
             .setApplicationUri("urn:eclipse:milo:sosj-cd-server:"+name+":"+addr+""+SSPort)
             .setApplicationName(LocalizedText.english("Eclipse Milo SOSJ CD OPC-UA Server " +name))
             .setBindAddresses(newArrayList(addr))
-            .setBindPort(bindPort) //OPCUA bindPort is often 4840, but this is not required unless for discovery server
+            .setBindPort(SSPort) //OPCUA bindPort is often 4840, but this is not required unless for discovery server
             .setBuildInfo(
                 new BuildInfo(
                     "urn:eclipse:milo:sosj-cd-server:"+name,
