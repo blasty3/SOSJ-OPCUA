@@ -79,6 +79,7 @@ public class ClientRunner
       {
         try
         {
+          
           client.disconnect().get();
           Stack.releaseSharedResources();
         } catch (InterruptedException | ExecutionException e)

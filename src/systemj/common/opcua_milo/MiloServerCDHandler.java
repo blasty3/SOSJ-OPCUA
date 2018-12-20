@@ -39,11 +39,11 @@ import static org.eclipse.milo.opcua.sdk.server.api.config.OpcUaServerConfig.USE
 
 //public class MiloServerHandler implements Runnable{
 
-public class MiloServerHandler {
+public class MiloServerCDHandler {
     
     private final OpcUaServer server;
 
-    public MiloServerHandler() throws Exception {
+    public MiloServerCDHandler() throws Exception {
         CryptoRestrictions.remove();
 
         KeyStoreLoader loader = new KeyStoreLoader().load();
@@ -105,7 +105,7 @@ public class MiloServerHandler {
 
     }
     
-    public MiloServerHandler(String name, String addr, int bindPort) throws Exception {
+    public MiloServerCDHandler(String name, String addr, int bindPort) throws Exception {
         CryptoRestrictions.remove();
 
         KeyStoreLoader loader = new KeyStoreLoader().load();
@@ -159,7 +159,7 @@ public class MiloServerHandler {
                 ImmutableList.of(
                     USER_TOKEN_POLICY_ANONYMOUS,
                     USER_TOKEN_POLICY_USERNAME))
-            .setDiscoveryServerEnabled(true)
+            .setDiscoveryServerEnabled(false)
             .setMulticastEnabled(true)
             .build();
 
@@ -172,17 +172,20 @@ public class MiloServerHandler {
     }
 
     public CompletableFuture<OpcUaServer> startup() {
-    	 return server.startup().whenComplete((opcUaServer, throwable) -> server
-    	            .registerWithDiscoveryServer("opc.tcp://localhost:4840/discovery", null, null));
+    	 return server.startup().whenComplete((opcUaServer, throwable) ->  System.out.println("done"));
+    	 //server.registerWithDiscoveryServer("opc.tcp://localhost:4840/discovery", null, null));
     }
     
     public CompletableFuture<OpcUaServer> startup(String DiscServAddr) {
-   	 return server.startup().whenComplete((opcUaServer, throwable) -> server
-   	            .registerWithDiscoveryServer("opc.tcp://"+DiscServAddr+":4840/discovery", null, null));
-   }
+   	  return server.startup().whenComplete((opcUaServer, throwable) -> 
+   	  System.out.println("done"));
+   	 //server.registerWithDiscoveryServer("opc.tcp://"+DiscServAddr+":4840/discovery", null, null));
+   
+    }
 
     public CompletableFuture<OpcUaServer> shutdown() {
         CompletableFuture<OpcUaServer> done = new CompletableFuture<>();
+        /*
         server.unregisterFromDiscoveryServer()
             .whenComplete((statusCode, throwable) -> server.shutdown().whenComplete((opcUaServer, throwable1) -> {
                 if (opcUaServer != null) {
@@ -191,6 +194,7 @@ public class MiloServerHandler {
                     done.completeExceptionally(throwable1);
                 }
             }));
+        */
         return done;
     }
 

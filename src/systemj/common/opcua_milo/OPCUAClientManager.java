@@ -58,7 +58,7 @@ public class OPCUAClientManager
     loader.load();
     OpcUaClientConfig config = OpcUaClientConfig.builder()
             .setApplicationName(LocalizedText.english("digitalpetri opc-ua client"))
-            .setApplicationUri("urn:digitalpetri:opcua:client")
+            .setApplicationUri("urn:sosj-opcua:opcua:client")
             .setCertificate(loader.getClientCertificate())
             .setKeyPair(loader.getClientKeyPair())
             .setEndpoint(endpointFinal)

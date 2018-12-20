@@ -37,8 +37,9 @@ import systemj.common.SJServiceRegistry;
 import systemj.common.SOAFacility.Support.SOABuffer;
 import systemj.common.opcua_milo.ClientExampleRunSOSJ;
 import systemj.common.opcua_milo.ClientRunner;
+import systemj.common.opcua_milo.MiloServerCDHandler;
 import systemj.common.opcua_milo.ClientExample;
-import systemj.common.opcua_milo.MiloServerHandler;
+import systemj.common.opcua_milo.MiloServerSSHandler;
 import systemj.common.opcua_milo.OPCUAClientServerObjRepo;
 import systemj.common.SOAFacility.TCPIPLinkRegistry;
 //import systemj.common.SignalObjBuffer;
@@ -369,6 +370,64 @@ public void parseSubSystem(Element subsystem, InterfaceManager im){
         List<Element> schedulers = subsystem.getChildren("Scheduler");
         List<Element> rmi = subsystem.getChildren("RMI");
 
+        //OPCUA config
+        //String RegistrationPeriod = "10000"; //some initialization value to avoid NullException being thrown. //in milliseconds??
+        String OwnAddr = "127.0.0.1"; //some initialization value to avoid NullException being thrown. //localhost by default
+        int BindPort = 4840; //some initialization value  //4840 is usually the port used in OPC UA, but not necessarily this unless it's a discovery server
+        
+        String DiscServAddr = "127.0.0.1"; //some initialization value to avoid NullException being thrown. //localhost by default
+        int ClPort = 2345;
+        
+        int SSPort = 2346;
+        
+        //END OPC UA config
+        
+        // OPC UA parameters
+        
+        String ssname = subsystem.getAttributeValue("Name");
+        
+        if(subsystem.getAttributeValue("Addr") != null){
+    		
+    		OwnAddr = subsystem.getAttribute("Addr").getValue();
+    		
+    	} else {
+    		throw new RuntimeException("SS " +ssname+ " is OPC UA enabled, but missing 'Addr' parameter ");
+    	}
+    	
+    	if(subsystem.getAttributeValue("DiscServAddr") != null){
+    		
+    		DiscServAddr = subsystem.getAttribute("DiscServAddr").getValue();
+    		
+    	} else {
+    		throw new RuntimeException("SS " +ssname+ " is OPC UA enabled, but missing 'DiscServAddr' parameter ");
+    	}
+    	
+    	if(subsystem.getAttributeValue("BindPort") != null){
+    		
+    	    BindPort = Integer.parseInt(subsystem.getAttribute("BindPort").getValue());
+    		
+    	} else {
+    		throw new RuntimeException("SS " +ssname+ " is OPC UA enabled, but missing 'BindPort' parameter ");
+    	}
+    	
+    	if(subsystem.getAttributeValue("ClPort") != null){
+    		
+    	    ClPort = Integer.parseInt(subsystem.getAttribute("ClPort").getValue());
+    		
+    	} else {
+    		throw new RuntimeException("SS " +subsystem+ " is OPC UA enabled, but missing 'ClPort' parameter ");
+    	}
+    	
+    	if(subsystem.getAttributeValue("SSPort") != null){
+    		
+    	    SSPort = Integer.parseInt(subsystem.getAttribute("SSPort").getValue());
+    		
+    	} else {
+    		throw new RuntimeException("SS " +subsystem+ " is OPC UA enabled, but missing 'SSPort' parameter ");
+    	}
+    	
+    	// OPC UA parameters END
+        
         JSONObject jsSSCDTot = new JSONObject();
         //Udayanto modification  // parse Subsystem to obtain all available services in the node-self
       //  Element devDescSS = subsystem.getChild("deviceDescription");
@@ -419,6 +478,37 @@ public void parseSubSystem(Element subsystem, InterfaceManager im){
                 System.exit(1);
             }
           }
+         
+         
+      // OPC UA Server for SS START
+         
+      // Create Milo Server
+     	
+     	try {
+     		
+     			
+     			MiloServerSSHandler milo_server_h = new MiloServerSSHandler(ssname,OwnAddr,BindPort,SSPort);
+
+     			milo_server_h.startup(DiscServAddr).get();
+     	        
+     	        OPCUAClientServerObjRepo.AddServerObjSS(ssname, milo_server_h);
+     	        //final CompletableFuture<Void> future = new CompletableFuture<>();
+
+     	        //Runtime.getRuntime().addShutdownHook(new Thread(() -> server.shutdown().thenRun(() -> future.complete(null))));
+
+     	        //future.get();
+     	        
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+     	
+     	System.out.println("Done creating Milo Server for SS " +ssname);
+     	
+     	// OPC UA Server for SS END
+     	
+     	//no client since this server is meant only for discovery and registration of SS.
+         
          
         JSONObject jsCDtot = new JSONObject();
         
@@ -631,7 +721,7 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
 
         boolean isServices = false;
         
-        //OPCUA config
+      //OPCUA config
         //String RegistrationPeriod = "10000"; //some initialization value to avoid NullException being thrown. //in milliseconds??
         String OwnAddr = "127.0.0.1"; //some initialization value to avoid NullException being thrown. //localhost by default
         int BindPort = 4840; //some initialization value  //4840 is usually the port used in OPC UA, but not necessarily this unless it's a discovery server
@@ -640,6 +730,8 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
         int ClPort = 2345;
         
         //END OPC UA config
+        
+        
         String cdname = cd.getAttributeValue("Name");
         String CDClassName = cd.getAttributeValue("Class");
         if(cd.getAttributeValue("IsServices") != null){
@@ -668,14 +760,12 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
         	}
         	*/
         	
-        	
-        	
-        	if(cd.getAttributeValue("OwnAddr") != null){
+        	if(cd.getAttributeValue("Addr") != null){
         		
-        		OwnAddr = cd.getAttribute("OwnAddr").getValue();
+        		OwnAddr = cd.getAttribute("Addr").getValue();
         		
         	} else {
-        		throw new RuntimeException("CD " +cdname+ " is OPC UA enabled, but missing 'OwnAddr' parameter ");
+        		throw new RuntimeException("CD " +cdname+ " is OPC UA enabled, but missing 'Addr' parameter ");
         	}
         	
         	if(cd.getAttributeValue("DiscServAddr") != null){
@@ -691,7 +781,7 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
         	    BindPort = Integer.parseInt(cd.getAttribute("BindPort").getValue());
         		
         	} else {
-        		throw new RuntimeException("CD " +cdname+ " is OPC UA enabled, but missing 'BindPort' parameter ");
+        		throw new RuntimeException("SS " +ssname+ " is OPC UA enabled, but missing 'BindPort' parameter ");
         	}
         	
         	if(cd.getAttributeValue("ClPort") != null){
@@ -703,35 +793,30 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
         	}
         	
         	
-        	// Create Milo Server
-        	
         	try {
-        		
-        			
-        			MiloServerHandler milo_server_h = new MiloServerHandler(cdname,OwnAddr,BindPort);
+     		
+     			
+     			MiloServerCDHandler milo_server_h_cd = new MiloServerCDHandler(cdname,OwnAddr,BindPort);
 
-        			milo_server_h.startup(DiscServAddr).get();
-        	        
-        	        OPCUAClientServerObjRepo.AddServerObj(cdname, milo_server_h);
-        	        //final CompletableFuture<Void> future = new CompletableFuture<>();
+     			//milo_server_h_cd.startup(DiscServAddr).get();
+     	        
+     	        OPCUAClientServerObjRepo.AddServerObjCD(cdname, milo_server_h_cd);
+     	        //final CompletableFuture<Void> future = new CompletableFuture<>();
 
-        	        //Runtime.getRuntime().addShutdownHook(new Thread(() -> server.shutdown().thenRun(() -> future.complete(null))));
+     	        //Runtime.getRuntime().addShutdownHook(new Thread(() -> server.shutdown().thenRun(() -> future.complete(null))));
 
-        	        //future.get();
-        	        
-        	        
-        			
-        		
+     	        //future.get();
+     	        
+     	        
+     			
+     		
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
         	
-        	System.out.println("Done creating Milo Server, now Client...");
-        	
-        	
-        	
         	// Create Milo Client?
+        	
         	ClientRunner clrun;
         	
         	try {
@@ -742,7 +827,7 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
     			
     			clrun.InstantiateClient();
     			
-    	        OPCUAClientServerObjRepo.AddClientObj(cdname, clrun);
+    	        OPCUAClientServerObjRepo.AddClientObjCD(cdname, clrun);
     	        //final CompletableFuture<Void> future = new CompletableFuture<>();
 
     	        //Runtime.getRuntime().addShutdownHook(new Thread(() -> server.shutdown().thenRun(() -> future.complete(null))));

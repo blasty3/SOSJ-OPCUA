@@ -99,6 +99,16 @@ public class SJServiceRegistry {
     	newServers.clear();
     }
     
+    public static boolean IsNewServersListEmpty() {
+    	if (newServers.size()>0) {
+    		return false;
+    	} else {
+    		return true;
+    	}
+    }
+    
+    
+    
     public static void AddOPCUAServerToRegistryServerNetwork(String ServerName, String RecordID, String DiscoveryURL, String[] Capabilities) throws JSONException{
         
         //if (IsInternalServ){

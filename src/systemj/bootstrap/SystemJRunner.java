@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.TimerTask;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,6 +35,7 @@ import systemj.common.SOAFacility.Support.SOABuffer;
 import systemj.common.opcua_milo.FindServersClient;
 import systemj.desktop.JdomParser;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -682,9 +684,25 @@ public class SystemJRunner
     				FindServersClient findServCl = new FindServersClient();
     				
     				try {
-    					findServCl.outputFindServersOnNetwork("opc.tcp://"+LDS_ADDR+":4840/discovery")
+    					  findServCl.outputFindServersOnNetwork("opc.tcp://"+LDS_ADDR+":4840/discovery")
     					      .thenCompose(aVoid -> findServCl.outputFindServers("opc.tcp://"+LDS_ADDR+":4840/discovery"))
     					.get();
+    					
+    					if(!SJServiceRegistry.IsNewServersListEmpty()) {
+    						Vector allNewServersList = SJServiceRegistry.GetNewServers();
+    						SJServiceRegistry.ClearNewServersList();
+    						
+    						for(int i=0;i<allNewServersList.size();i++){
+    							String uri = allNewServersList.get(i).toString();
+    							String[] uriParts = uri.split(":");
+    							String addr = uriParts[5];
+    							int port = Integer.parseInt(uriParts[6]);
+    							
+    							
+    							
+    						}
+    					}
+    					      
     				} catch (InterruptedException e) {
     					// TODO Auto-generated catch block
     					e.printStackTrace();

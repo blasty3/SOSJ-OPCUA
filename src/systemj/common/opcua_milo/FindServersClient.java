@@ -14,6 +14,7 @@
 package systemj.common.opcua_milo;
 
 import java.util.UUID;
+import java.util.Vector;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
@@ -189,13 +190,13 @@ public class FindServersClient {
                 
             }
             
-            Vector 
-            
             finished.complete(null);
         });
 
         return finished;
     }
+    
+    
 
     public CompletableFuture<ApplicationDescription[]> findServers(String discoveryEndpointUrl) {
 

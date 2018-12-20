@@ -31,6 +31,6 @@ public interface ClientExample {
         return new AnonymousProvider();
     }
 
-    void run(OpcUaClient client, CompletableFuture<OpcUaClient> future) throws Exception;
+    void run(OpcUaClient client, CompletableFuture<OpcUaClient> future, String name) throws Exception;
 
 }
