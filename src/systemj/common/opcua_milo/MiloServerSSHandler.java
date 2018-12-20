@@ -204,6 +204,10 @@ public class MiloServerSSHandler {
    	            .registerWithDiscoveryServer("opc.tcp://"+DiscServAddr+":4840/discovery", null, null));
     }
     
+    public CompletableFuture<OpcUaServer> startupWithoutLDS () {
+      	 return server.startup();
+       }
+    
     public boolean reRegisterServer (String DiscServAddr) {
     	return server.registerWithDiscoveryServer("opc.tcp://"+DiscServAddr+":4840/discovery", null, null);
     }
@@ -218,6 +222,18 @@ public class MiloServerSSHandler {
                     done.completeExceptionally(throwable1);
                 }
             }));
+        return done;
+    }
+    
+    public CompletableFuture<OpcUaServer> shutdownWithoutLDS() {
+        CompletableFuture<OpcUaServer> done = new CompletableFuture<>();
+        server.shutdown().whenComplete((opcUaServer, throwable1) -> {
+                if (opcUaServer != null) {
+                    done.complete(opcUaServer);
+                } else {
+                    done.completeExceptionally(throwable1);
+                }
+            });
         return done;
     }
 

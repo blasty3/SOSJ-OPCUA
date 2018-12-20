@@ -145,7 +145,7 @@ public class SystemJRunner
         
         private static void printSOSJOPCUATestUsage(){
             System.out.println("SOSJ (SOA + SystemJ) using OPC-UA Discovery, by Udayanto Dwi Atmojo, Dept Electrical Engineering and Automation, Aalto University");
-	System.out.println("Usage: 1st arg - OPC UA Milo LDS Address. ");
+	System.out.println("Usage: no arg ");
 	//System.out.println();
 	//System.out.println("Options:");
 	//System.out.println("\t-version\tprint version");
@@ -382,7 +382,10 @@ public class SystemJRunner
                                     	
                              			try {
                              				MiloServerSSHandler milo_server_h = new MiloServerSSHandler("testSS","127.0.0.1",4840);
-											milo_server_h.startup(args[i+1]).get();
+											
+                             				milo_server_h.startupWithoutLDS();
+                             				
+                             				//milo_server_h.startup(args[i+1]).get();
 											
 											final CompletableFuture<Void> future = new CompletableFuture<>();
 							     	        Runtime.getRuntime().addShutdownHook(new Thread(() -> milo_server_h.getServer().shutdown().thenRun(() -> future.complete(null))));
