@@ -3,15 +3,15 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="C:/Udayanto/Dropbox/Private/EclipseWork/SOSJ-OPCUA/lib/server-examples-0.1.2-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="C:/Udayanto/Dropbox/Private/EclipseWork/SOSJ-OPCUA/lib/asm-all-5.0.4.jar"/>
-	<classpathentry kind="lib" path="C:/Udayanto/Dropbox/Private/EclipseWork/SOSJ-OPCUA/lib/sdk-client-0.1.2-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="C:/Udayanto/Dropbox/Private/EclipseWork/SOSJ-OPCUA/lib/sdk-core-0.1.2-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="C:/Udayanto/Dropbox/Private/EclipseWork/SOSJ-OPCUA/lib/sdk-server-0.1.2-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="C:/Udayanto/Dropbox/Private/EclipseWork/SOSJ-OPCUA/lib/stack-client-0.1.2-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="C:/Udayanto/Dropbox/Private/EclipseWork/SOSJ-OPCUA/lib/stack-core-0.1.2-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="C:/Udayanto/Dropbox/Private/EclipseWork/SOSJ-OPCUA/lib/stack-server-0.1.2-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="C:/Udayanto/Dropbox/Private/EclipseWork/SOSJ-OPCUA/lib/sqlite-jdbc-3.8.10.1.jar"/>
+	<classpathentry kind="lib" path="C:/Udayanto/Dropbox/Private/EclipseWork/SOSJ-OPCUA/lib/asm-all-5.0.4.jar"/>
 	<classpathentry kind="lib" path="C:/Udayanto/Dropbox/Private/EclipseWork/SOSJ-OPCUA/lib/J2ME-JSON.jar"/>
 	<classpathentry kind="lib" path="C:/Udayanto/Dropbox/Private/EclipseWork/SOSJ-OPCUA/lib/jdom.jar"/>
+	<classpathentry kind="lib" path="C:/Udayanto/Dropbox/Private/EclipseWork/SOSJ-OPCUA/lib/sdk-client-0.1.2-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

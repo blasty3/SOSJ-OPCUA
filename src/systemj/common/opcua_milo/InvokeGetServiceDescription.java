@@ -32,13 +32,13 @@ import systemj.common.SJServiceRegistry;
 
 import static org.eclipse.milo.opcua.stack.core.util.ConversionUtil.l;
 
-public class InvokeGetServiceDescription implements ClientExample {
+public class InvokeGetServiceDescription implements ClientTemplateSS {
 
-	public void execute(String Addr, int port) throws Exception {
+	public void execute(String Addr, int port, String name) throws Exception {
     //public static void main(String[] args) throws Exception {
     	InvokeGetServiceDescription example = new InvokeGetServiceDescription();
 
-        new ClientRequestServiceDescriptionRunner(example, Addr, port).run();
+        new ClientRequestServiceDescriptionRunner(example, Addr, port, name).run();
     //}
 	}
 	

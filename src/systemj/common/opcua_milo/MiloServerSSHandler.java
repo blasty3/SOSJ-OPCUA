@@ -140,7 +140,7 @@ public class MiloServerSSHandler {
         });
 
         OpcUaServerConfig serverConfig = OpcUaServerConfig.builder()
-            .setApplicationUri("urn:eclipse:milo:sosj-cd-server:"+name+":"+SSPort)
+            .setApplicationUri("urn:eclipse:milo:sosj-cd-server:"+name+":"+addr+""+SSPort)
             .setApplicationName(LocalizedText.english("Eclipse Milo SOSJ CD OPC-UA Server " +name))
             .setBindAddresses(newArrayList(addr))
             .setBindPort(bindPort) //OPCUA bindPort is often 4840, but this is not required unless for discovery server
@@ -202,7 +202,11 @@ public class MiloServerSSHandler {
     public CompletableFuture<OpcUaServer> startup(String DiscServAddr) {
    	 return server.startup().whenComplete((opcUaServer, throwable) -> server
    	            .registerWithDiscoveryServer("opc.tcp://"+DiscServAddr+":4840/discovery", null, null));
-   }
+    }
+    
+    public boolean reRegisterServer (String DiscServAddr) {
+    	return server.registerWithDiscoveryServer("opc.tcp://"+DiscServAddr+":4840/discovery", null, null);
+    }
 
     public CompletableFuture<OpcUaServer> shutdown() {
         CompletableFuture<OpcUaServer> done = new CompletableFuture<>();

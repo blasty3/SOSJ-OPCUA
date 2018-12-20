@@ -39,17 +39,22 @@ public class ClientRequestServiceDescriptionRunner {
 
     private final KeyStoreLoader loader = new KeyStoreLoader();
 
-    private final ClientExample clientExample;
+    //private final ClientExample clientExample;
+    private final ClientTemplateSS clientExample;
     
     private String Addr = "";
     
     private int port = 12686;
+    private String name = "";
 
-    public ClientRequestServiceDescriptionRunner(ClientExample clientExample, String Addr, int port) throws Exception {
-        this.clientExample = clientExample;
+    public ClientRequestServiceDescriptionRunner(ClientTemplateSS clientExample, String Addr, int port, String name) throws Exception {
+        //this.clientExample = clientExample;
 
+    	this.clientExample = clientExample;
+    	
         this.Addr = Addr;
         this.port = port;
+        this.name = name;
        // exampleServer = new ExampleServer();
         //exampleServer.startup().get();
     }
@@ -97,8 +102,8 @@ public class ClientRequestServiceDescriptionRunner {
             }
 
             try {
-                Thread.sleep(1000);
-                System.exit(0);
+                Thread.sleep(5);
+                //System.exit(0);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -108,8 +113,8 @@ public class ClientRequestServiceDescriptionRunner {
             OpcUaClient client = createClient(Addr, port);
 
             try {
-                clientExample.run(client, future);
-                future.get(10, TimeUnit.SECONDS);
+                clientExample.run(client, future, name);
+                future.get(5, TimeUnit.SECONDS);
             } catch (Throwable t) {
                 logger.error("Error running client example: {}", t.getMessage(), t);
                 future.complete(client);

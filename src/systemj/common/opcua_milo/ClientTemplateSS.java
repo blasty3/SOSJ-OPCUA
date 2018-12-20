@@ -21,7 +21,7 @@ import org.eclipse.milo.opcua.sdk.client.api.identity.IdentityProvider;
 import org.eclipse.milo.opcua.stack.core.security.SecurityPolicy;
 
 
-public interface ClientExample {
+public interface ClientTemplateSS {
 
     default SecurityPolicy getSecurityPolicy() {
         return SecurityPolicy.None;
@@ -31,6 +31,6 @@ public interface ClientExample {
         return new AnonymousProvider();
     }
 
-    void run(OpcUaClient client, CompletableFuture<OpcUaClient> future) throws Exception;
+    void run(OpcUaClient client, CompletableFuture<OpcUaClient> future, String name) throws Exception;
 
 }

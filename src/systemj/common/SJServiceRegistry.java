@@ -58,7 +58,6 @@ public class SJServiceRegistry {
             	if(currentCD_OPC_UA_Registry.has(ApplicationURI)) {
             		
             		
-       
             	} else {
             		JSONObject jsChild = new JSONObject();
             		JSONObject jsDiscUrls = new JSONObject();

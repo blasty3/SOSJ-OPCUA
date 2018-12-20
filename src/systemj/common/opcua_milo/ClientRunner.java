@@ -99,7 +99,7 @@ public class ClientRunner
 
       try
       {
-        uaClient.run(client, future);
+        uaClient.run(client, future );
       } catch (Exception t)
       {
         logger.error("Error running client example: {}", t.getMessage(), t);

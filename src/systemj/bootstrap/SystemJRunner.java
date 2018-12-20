@@ -32,7 +32,9 @@ import systemj.common.SOAFacility.RegSender;
 //import systemj.common.SOAFacility.RegRemoteDiscMessageReceiverThread;
 //import systemj.common.SOAFacility.RegRemoteMessageReceiverThread;
 import systemj.common.SOAFacility.Support.SOABuffer;
+import systemj.common.opcua_milo.ClientRequestServiceDescriptionRunner;
 import systemj.common.opcua_milo.FindServersClient;
+import systemj.common.opcua_milo.InvokeGetServiceDescription;
 import systemj.desktop.JdomParser;
 
 import java.util.concurrent.CompletableFuture;
@@ -695,10 +697,19 @@ public class SystemJRunner
     						for(int i=0;i<allNewServersList.size();i++){
     							String uri = allNewServersList.get(i).toString();
     							String[] uriParts = uri.split(":");
-    							String addr = uriParts[5];
-    							int port = Integer.parseInt(uriParts[6]);
     							
+    							String ssName = uriParts[5];
+    							String addr = uriParts[6];
+    							int port = Integer.parseInt(uriParts[7]);
     							
+    							InvokeGetServiceDescription invGetServ = new InvokeGetServiceDescription();
+    							
+    							try {
+									invGetServ.execute(addr, port, ssName);
+								} catch (Exception e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
     							
     						}
     					}
