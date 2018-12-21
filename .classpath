@@ -13,5 +13,6 @@
 	<classpathentry kind="lib" path="C:/Udayanto/Dropbox/Private/EclipseWork/SOSJ-OPCUA/lib/J2ME-JSON.jar"/>
 	<classpathentry kind="lib" path="C:/Udayanto/Dropbox/Private/EclipseWork/SOSJ-OPCUA/lib/jdom.jar"/>
 	<classpathentry kind="lib" path="C:/Udayanto/Dropbox/Private/EclipseWork/SOSJ-OPCUA/lib/sdk-client-0.1.2-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="C:/Udayanto/Dropbox/Private/EclipseWork/SOSJ-OPCUA/lib/fbrt.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
