@@ -264,4 +264,9 @@ public class MulticastReceiverNoGroup extends GenericSignalReceiver implements S
 	private int buffer_length = 64000;
 	private MulticastSocket socket = null;
 	private InetAddress interfaceAddress = null;
+	@Override
+	public void execute() {
+		// TODO Auto-generated method stub
+		
+	}
 }

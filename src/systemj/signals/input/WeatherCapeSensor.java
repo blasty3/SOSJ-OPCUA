@@ -574,5 +574,11 @@ public class WeatherCapeSensor extends GenericSignalReceiver
 	private int readlength = 0;
 	private int buffer_length = 0;
 	private ServerSocket serverSocket = null;
+
+	@Override
+	public void execute() {
+		// TODO Auto-generated method stub
+		
+	}
         
 }

@@ -8,6 +8,7 @@ public abstract class GenericSignalReceiver implements Runnable
 	public String cdname;
         protected volatile boolean active = true;
         protected volatile boolean terminated = false;
+        protected volatile boolean IsRead = false;
 	/**
 	 * This two element Object array represents SystemJ signal</br></br>
 	 * buffer[0] contains signal status</br>
@@ -26,8 +27,11 @@ public abstract class GenericSignalReceiver implements Runnable
 		buffer[0] = Boolean.FALSE;
 	}
 	public synchronized void getBuffer(Object[] obj){
-		for(int i=0;i<buffer.length; i++)
+		
+		for(int i=0;i<buffer.length; i++) {
 			obj[i] = buffer[i];
+		}
+		
 		buffer[0] = Boolean.FALSE; // After reading always set the signal status to false
 	}
 	public synchronized void setBuffer(Object[] obj){
@@ -35,7 +39,31 @@ public abstract class GenericSignalReceiver implements Runnable
 			buffer = new Object[obj.length];
 		for(int i=0;i<obj.length; i++)
 			buffer[i] = obj[i];
+		
+		
 	}
+	
+	public synchronized void setBufferIncomingValue(Object[] obj){
+		if(buffer.length < obj.length)
+			buffer = new Object[obj.length];
+		for(int i=0;i<obj.length; i++)
+			buffer[i] = obj[i];
+		
+		if(!IsRead) {
+			IsRead=true;
+		}
+		
+	}
+	
+	
+	public synchronized boolean getIsRead(){
+		return IsRead;
+	}
+	
+	public synchronized void setIsRead(boolean status){
+		IsRead = status;
+	}
+	
         
         public synchronized void suspendInputSignalThread(){
             active=false;
@@ -60,4 +88,6 @@ public abstract class GenericSignalReceiver implements Runnable
 	public abstract void configure(Hashtable/*<String,String>*/ data) throws RuntimeException;
 	
 	public abstract void run() ;
+	
+	public abstract void execute();
 }

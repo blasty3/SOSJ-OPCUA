@@ -74,6 +74,8 @@ public class SystemJRunner
         private static boolean IsSOSJOPCUA = false;
         private static boolean IsSOSJOPCUALDS = false;
         
+        private static boolean IsSOSJOPCUATest = false;
+        
         
         
         private static String SOSJRegID, SOSJRegAddr,SOSJRegAdvExpiryTime;
@@ -372,7 +374,7 @@ public class SystemJRunner
                                 }
                             
                         } else if(args[i].equals("-sosjopcuatest")){
-                            //IsSOSJOPCUA = true;
+                            IsSOSJOPCUATest = true;
                             
                             if(args.length>i+1){
                                     if(args[i+1].equalsIgnoreCase("help")){
@@ -380,26 +382,8 @@ public class SystemJRunner
                                         System.exit(1);
                                     } else {
                                     	
-                             			try {
-                             				MiloServerSSHandler milo_server_h = new MiloServerSSHandler("testSS","127.0.0.1",4840);
-											
-                             				milo_server_h.startupWithoutLDS();
-                             				
-                             				//milo_server_h.startup(args[i+1]).get();
-											
-											final CompletableFuture<Void> future = new CompletableFuture<>();
-							     	        Runtime.getRuntime().addShutdownHook(new Thread(() -> milo_server_h.getServer().shutdown().thenRun(() -> future.complete(null))));
-											
-										} catch (InterruptedException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (ExecutionException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} catch (Exception e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										}
+                                    	printSOSJOPCUATestUsage();
+                                        System.exit(1);
                                     	
                                     	//here
                                     //GtwyAddr = args[i+1];
@@ -411,8 +395,30 @@ public class SystemJRunner
                                     break;
                                   }
                                 } else {
-                                	printSOSJOPCUATestUsage();
-                                    System.exit(1);
+                                	
+                                	try {
+                         				MiloServerSSHandler milo_server_h = new MiloServerSSHandler("testSS","127.0.0.1",12686);
+										
+                         				milo_server_h.startupWithoutLDS();
+                         				
+                         				//milo_server_h.startup(args[i+1]).get();
+										
+										final CompletableFuture<Void> future = new CompletableFuture<>();
+						     	        Runtime.getRuntime().addShutdownHook(new Thread(() -> milo_server_h.getServer().shutdown().thenRun(() -> future.complete(null))));
+										
+									} catch (InterruptedException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									} catch (ExecutionException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									} catch (Exception e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+                                	
+                                	//printSOSJOPCUATestUsage();
+                                   // System.exit(1);
                                 }
                             
                         }
@@ -489,6 +495,8 @@ public class SystemJRunner
                 setSubnetMaskAddr();
                 StartOPC_UA_LDS();
             
+            } else if(IsSOSJOPCUATest) {
+            	
             } 
             
             else

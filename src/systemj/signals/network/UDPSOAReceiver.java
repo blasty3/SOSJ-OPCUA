@@ -558,4 +558,9 @@ public class UDPSOAReceiver extends GenericSignalReceiver implements Serializabl
         private boolean queryService;
         //private String servName;
         //private boolean IsDoubleACK;
+		@Override
+		public void execute() {
+			// TODO Auto-generated method stub
+			
+		}
 }       

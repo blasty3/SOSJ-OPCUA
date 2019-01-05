@@ -30,8 +30,16 @@ import org.eclipse.milo.opcua.stack.core.security.SecurityPolicy;
 import org.eclipse.milo.opcua.stack.core.types.builtin.DateTime;
 import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
 import org.eclipse.milo.opcua.stack.core.types.structured.BuildInfo;
+import org.eclipse.milo.opcua.stack.core.types.structured.ResponseHeader;
+import org.eclipse.milo.opcua.stack.core.types.structured.TestStackExRequest;
+import org.eclipse.milo.opcua.stack.core.types.structured.TestStackExResponse;
+import org.eclipse.milo.opcua.stack.core.types.structured.TestStackRequest;
+import org.eclipse.milo.opcua.stack.core.types.structured.TestStackResponse;
 import org.eclipse.milo.opcua.stack.core.util.CryptoRestrictions;
+import org.json.me.JSONObject;
 import org.slf4j.LoggerFactory;
+
+import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UShort;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.eclipse.milo.opcua.sdk.server.api.config.OpcUaServerConfig.USER_TOKEN_POLICY_ANONYMOUS;
@@ -42,6 +50,8 @@ import static org.eclipse.milo.opcua.sdk.server.api.config.OpcUaServerConfig.USE
 public class MiloServerCDHandler {
     
     private final OpcUaServer server;
+    
+    
 
     public MiloServerCDHandler() throws Exception {
         CryptoRestrictions.remove();
@@ -105,7 +115,7 @@ public class MiloServerCDHandler {
 
     }
     
-    public MiloServerCDHandler(String name, String addr, int bindPort) throws Exception {
+    public MiloServerCDHandler(String ssname, String cdname, String addr, int bindPort, JSONObject jsSigsChans) throws Exception {
         CryptoRestrictions.remove();
 
         KeyStoreLoader loader = new KeyStoreLoader().load();
@@ -133,22 +143,22 @@ public class MiloServerCDHandler {
         });
 
         OpcUaServerConfig serverConfig = OpcUaServerConfig.builder()
-            .setApplicationUri("urn:eclipse:milo:sosjcdserver:"+name)
-            .setApplicationName(LocalizedText.english("Eclipse Milo SOSJ CD OPC-UA Server " +name))
+            .setApplicationUri("urn:eclipse:milo:sosjcdserver:"+ssname+":"+cdname)
+            .setApplicationName(LocalizedText.english("Eclipse Milo SOSJ CD OPC-UA Server of SS "+ssname+" and CD " +cdname))
             .setBindAddresses(newArrayList(addr))
             .setBindPort(bindPort) //OPCUA bindPort is often 4840, but this is not required unless for discovery server
             .setBuildInfo(
                 new BuildInfo(
-                    "urn:eclipse:milo:sosj-cd-server:"+name,
+                    "urn:eclipse:milo:sosj-cd-server:"+ssname+":"+cdname,
                     "eclipse",
-                    "eclipse milo cd sosj server " +name,
+                    "eclipse milo cd sosj server SS "+ssname+" CD " +cdname,
                     OpcUaServer.SDK_VERSION,
                     "", DateTime.now()))
             .setCertificateManager(certificateManager)
             .setCertificateValidator(certificateValidator)
             .setIdentityValidator(identityValidator)
-            .setProductUri("urn:eclipse:milo:sosjcdserver:" +name)
-            .setServerName(name)
+            .setProductUri("urn:eclipse:milo:sosjcdserver:" +cdname)
+            .setServerName(ssname+"/"+cdname)
             .setSecurityPolicies(
                 EnumSet.of(
                     SecurityPolicy.None,
@@ -164,6 +174,24 @@ public class MiloServerCDHandler {
             .build();
 
         server = new OpcUaServer(serverConfig);
+        
+        
+        server.getNamespaceManager().registerAndAdd(
+        		SOSJOPCUAServerNamespaceForCD.NAMESPACE_URI,
+                idx -> new SOSJOPCUAServerNamespaceForCD(server, idx, "",jsSigsChans));
+        
+        server.getServer().addRequestHandler(TestStackRequest.class, service ->
+        {
+          TestStackRequest request = service.getRequest();
+          ResponseHeader header = service.createResponseHeader();
+          service.setResponse(new TestStackResponse(header, request.getInput()));
+        });
+        server.getServer().addRequestHandler(TestStackExRequest.class, service ->
+        {
+          TestStackExRequest request = service.getRequest();
+          ResponseHeader header = service.createResponseHeader();
+          service.setResponse(new TestStackExResponse(header, request.getInput()));
+      });
 
     }
 

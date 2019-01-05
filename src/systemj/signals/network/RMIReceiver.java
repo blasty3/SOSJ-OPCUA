@@ -49,4 +49,10 @@ public class RMIReceiver extends GenericSignalReceiver implements RemoteObject {
 	@Override
 	public void run() { }
 
+	@Override
+	public void execute() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

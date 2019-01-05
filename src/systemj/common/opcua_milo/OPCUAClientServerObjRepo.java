@@ -52,27 +52,78 @@ public class OPCUAClientServerObjRepo {
     }
 	
 	
-	//For CD
+	//For CD Client
 	
 	
-	public static void AddClientObjCD(String CLName, ClientRunner OPCUAClientRunnerObj){
+	public static void AddClientObjCD(String CLCDName, String CLSigName, ClientRunner OPCUAClientRunnerObj){
         synchronized(OpcUaClientsCDLock){
-        	OpcUaClientsCD.put(CLName, OPCUAClientRunnerObj);
+        	
+        	if(OpcUaClientsCD.containsKey(CLCDName)) {
+        		
+        		Hashtable clcdnameSigs = (Hashtable) OpcUaClientsCD.get(CLCDName);
+        		
+        		clcdnameSigs.put(CLSigName, OPCUAClientRunnerObj);
+        		
+        		OpcUaClientsCD.put(CLCDName,clcdnameSigs);
+        		
+        	} else {
+        		
+        		Hashtable clcdnameSigs = new Hashtable();
+        		clcdnameSigs.put(CLSigName, OPCUAClientRunnerObj);
+        		
+        		OpcUaClientsCD.put(CLCDName,clcdnameSigs);
+        		
+        	}
+        	
+        	//OpcUaClientsCD.put(CLCDName, OPCUAClientRunnerObj);
         }
     }
 	
-	public static void RemoveClientObjCD(String CLName){
+	public static void RemoveClientObjCD(String CLCDName, String CLName){
         synchronized(OpcUaClientsCDLock){
-        	OpcUaClientsCD.remove(CLName);
+        	
+        	if(OpcUaClientsCD.containsKey(CLCDName)) {
+        		
+        		Hashtable clcdnameSigs = (Hashtable) OpcUaClientsCD.get(CLCDName);
+        		
+        		clcdnameSigs.remove(CLName);
+        		
+        		OpcUaClientsCD.put(CLCDName, clcdnameSigs);
+        		
+        	}
+        	
+        	
+        	//
+        }
+    }
+	
+	public static ClientRunner GetClientObjCD(String CLCDName, String CLName){
+        synchronized(OpcUaClientsCDLock){
+        	
+        	if(OpcUaClientsCD.containsKey(CLCDName)) {
+        		Hashtable hashSigList = (Hashtable)OpcUaClientsCD.get(CLCDName);
+        		return (ClientRunner) hashSigList.get(CLName);
+        		
+        	} else {
+        		return new ClientRunner();
+        	}
+        	
+        	
         }
     }
 	
 	
-	
+	//for CD Server
 	
 	public static void AddServerObjCD(String SEName, MiloServerCDHandler MiloServerObj){
         synchronized(OpcUaServersCDLock){
         	OpcUaServersCD.put(SEName, MiloServerObj);
+        }
+    }
+	
+	public static MiloServerCDHandler GetServerObjCD(String SEName){
+        synchronized(OpcUaServersCDLock){
+        	return (MiloServerCDHandler) OpcUaServersCD.get(SEName);
         }
     }
 	

@@ -40,4 +40,9 @@ public class InputFileReader extends GenericSignalReceiver implements Serializab
 	public InputFileReader(){
 		super(); // Initializes the buffer
 	}
+	@Override
+	public void execute() {
+		// TODO Auto-generated method stub
+		
+	}
 }

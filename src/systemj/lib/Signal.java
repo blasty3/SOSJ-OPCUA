@@ -103,6 +103,7 @@ public class Signal implements Serializable{
 	
 	public void gethook(){
 		if(server != null){
+			server.execute();
 			server.getBuffer(toReceive);
 			if(((Boolean)toReceive[0]).booleanValue()){
 				this.status = true;

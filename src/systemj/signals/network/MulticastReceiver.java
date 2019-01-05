@@ -232,4 +232,9 @@ public class MulticastReceiver extends GenericSignalReceiver implements Serializ
 	private int buffer_length = 64000;
 	private MulticastSocket socket = null;
 	private InetAddress interfaceAddress = null;
+	@Override
+	public void execute() {
+		// TODO Auto-generated method stub
+		
+	}
 }

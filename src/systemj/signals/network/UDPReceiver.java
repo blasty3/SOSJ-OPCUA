@@ -252,4 +252,9 @@ public class UDPReceiver extends GenericSignalReceiver implements Serializable
 	private Serializer se = null;
 	private int buffer_length = 64000;
 	private DatagramSocket socket = null;
+	@Override
+	public void execute() {
+		// TODO Auto-generated method stub
+		
+	}
 }

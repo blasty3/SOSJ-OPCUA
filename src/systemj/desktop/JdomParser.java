@@ -733,7 +733,7 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
         int BindPort = 4840; //some initialization value  //4840 is usually the port used in OPC UA, but not necessarily this unless it's a discovery server
         
         String DiscServAddr = "127.0.0.1"; //some initialization value to avoid NullException being thrown. //localhost by default
-        int ClPort = 2345;
+        //int ClPort = 2345;
         
         //END OPC UA config
         
@@ -790,7 +790,7 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
         		throw new RuntimeException("SS " +ssname+ " is OPC UA enabled, but missing 'BindPort' parameter ");
         	}
         	
-        	
+        	/*
         	if(cd.getAttributeValue("ClPort") != null){
         		
         	    ClPort = Integer.parseInt(cd.getAttribute("ClPort").getValue());
@@ -798,55 +798,9 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
         	} else {
         		throw new RuntimeException("CD " +cdname+ " is OPC UA enabled, but missing 'ClPort' parameter ");
         	}
+        	*/
         	
         	
-        	
-        	try {
-     		
-     			
-     			MiloServerCDHandler milo_server_h_cd = new MiloServerCDHandler(cdname,OwnAddr,BindPort);
-
-     			milo_server_h_cd.startup(DiscServAddr).get();
-     	        
-     	        OPCUAClientServerObjRepo.AddServerObjCD(cdname, milo_server_h_cd);
-     	        //final CompletableFuture<Void> future = new CompletableFuture<>();
-
-     	        //Runtime.getRuntime().addShutdownHook(new Thread(() -> server.shutdown().thenRun(() -> future.complete(null))));
-
-     	        //future.get();
-     	        
-     	        
-     			
-     		
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        	
-        	// Create Milo Client?
-        	
-        	
-        	ClientRunner clrun;
-        	
-        	try {
-        		
-        		ClientExampleRunSOSJ icl = new ClientExampleRunSOSJ();
-    			
-    			clrun = new ClientRunner(OwnAddr, ClPort, cdname, icl);
-    			
-    			clrun.InstantiateClient();
-    			
-    	        OPCUAClientServerObjRepo.AddClientObjCD(cdname, clrun);
-    	        //final CompletableFuture<Void> future = new CompletableFuture<>();
-
-    	        //Runtime.getRuntime().addShutdownHook(new Thread(() -> server.shutdown().thenRun(() -> future.complete(null))));
-
-    	        //future.get();
-    	        
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
         	
         	
         }
@@ -1491,11 +1445,48 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
                                         client.cdname = cdname;
                                         client.configure(config);
                                         
+                                        
+                                        
                                         // Reflection !!
                                         Field f = cdins.getClass().getField(port.getAttributeValue("Name"));
                                         Signal signal = (Signal)f.get(cdins);
                                         signal.setClient(client);
                                         signal.setInit();
+                                        
+                                        
+                                        if(IsSOSJOPCUA) {
+                                        	
+                                        	String sigName = port.getAttributeValue("Name");
+                                        	// Create Milo Client?
+                                        	
+                                        	
+                                        	ClientRunner clrun;
+                                        	
+                                        	try {
+                                        		
+                                        		ClientExampleRunSOSJ icl = new ClientExampleRunSOSJ();
+                                    			
+                                    			//clrun = new ClientRunner(OwnAddr, ClPort, ssname, cdname, icl);
+                                    			
+                                        		//clrun = new ClientRunner(ssname,cdname,icl);
+                                        		clrun = new ClientRunner(icl);
+                                        		
+                                    			//clrun.InstantiateClient();
+                                    			
+                                    	        OPCUAClientServerObjRepo.AddClientObjCD(cdname,sigName, clrun);
+                                    	        //final CompletableFuture<Void> future = new CompletableFuture<>();
+
+                                    	        //Runtime.getRuntime().addShutdownHook(new Thread(() -> server.shutdown().thenRun(() -> future.complete(null))));
+
+                                    	        //future.get();
+                                    	        
+                                    		} catch (Exception e) {
+                                    			// TODO Auto-generated catch block
+                                    			e.printStackTrace();
+                                    		}
+                                        	
+                                        	
+                                        }
                                         
                                         //Object outSigObj = (Object) signal;
                                         //Object outSigObj2 = (Object) client;
@@ -2007,6 +1998,32 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
     }
     
     CDLCBuffer.AddCDMacroState(cdname, "Active");
+    
+    if(IsSOSJOPCUA) {
+    	
+    	try {
+     		
+ 			
+ 			MiloServerCDHandler milo_server_h_cd = new MiloServerCDHandler(ssname, cdname,OwnAddr,BindPort, jsSigsChans);
+
+ 			milo_server_h_cd.startup(DiscServAddr).get();
+ 	        
+ 	        OPCUAClientServerObjRepo.AddServerObjCD(cdname, milo_server_h_cd);
+ 	        //final CompletableFuture<Void> future = new CompletableFuture<>();
+
+ 	        //Runtime.getRuntime().addShutdownHook(new Thread(() -> server.shutdown().thenRun(() -> future.complete(null))));
+
+ 	        //future.get();
+ 	        
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    
+    	
+    	
+    }
     
         return cdins;
 }

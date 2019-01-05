@@ -100,5 +100,11 @@ public class ServiceRegistryFetcher extends GenericSignalReceiver implements Ser
             }
         
     }
+
+	@Override
+	public void execute() {
+		// TODO Auto-generated method stub
+		
+	}
     
 }

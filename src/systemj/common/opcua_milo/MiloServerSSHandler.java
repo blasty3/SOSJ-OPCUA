@@ -115,11 +115,11 @@ public class MiloServerSSHandler {
     public MiloServerSSHandler(String name, String addr, int SSPort) throws Exception {
         CryptoRestrictions.remove();
 
-        //KeyStoreLoader loader = new KeyStoreLoader().load();
+        KeyStoreLoader loader = new KeyStoreLoader().load();
 
         DefaultCertificateManager certificateManager = new DefaultCertificateManager(
-       //     loader.getServerKeyPair(),
-        //    loader.getServerCertificate()
+           loader.getServerKeyPair(),
+            loader.getServerCertificate()
         );
 
         File securityTempDir = new File(System.getProperty("java.io.tmpdir"), "security");
@@ -166,15 +166,20 @@ public class MiloServerSSHandler {
                 ImmutableList.of(
                     USER_TOKEN_POLICY_ANONYMOUS,
                     USER_TOKEN_POLICY_USERNAME))
-            .setDiscoveryServerEnabled(true)
+            .setDiscoveryServerEnabled(false)
             .setMulticastEnabled(true)
             .build();
 
         server = new OpcUaServer(serverConfig);
         
+        
+        
         server.getNamespaceManager().registerAndAdd(
                 SOSJOPCServerNamespace.NAMESPACE_URI,
                 idx -> new SOSJOPCServerNamespace(server, idx, name));
+        
+        
+        
         server.getServer().addRequestHandler(TestStackRequest.class, service ->
         {
           TestStackRequest request = service.getRequest();
@@ -188,6 +193,8 @@ public class MiloServerSSHandler {
           service.setResponse(new TestStackExResponse(header, request.getInput()));
     });
 
+        
+        
     }
 
     public OpcUaServer getServer() {

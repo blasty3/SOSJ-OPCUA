@@ -622,6 +622,12 @@ public class TransceiveDisc extends GenericSignalReceiver{
                    return js;
         
     }
+
+	@Override
+	public void execute() {
+		// TODO Auto-generated method stub
+		
+	}
     
     
 }

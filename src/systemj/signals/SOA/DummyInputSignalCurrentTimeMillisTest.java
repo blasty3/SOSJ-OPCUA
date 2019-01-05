@@ -47,5 +47,11 @@ public class DummyInputSignalCurrentTimeMillisTest extends GenericSignalReceiver
         }
         
     }
+
+	@Override
+	public void execute() {
+		// TODO Auto-generated method stub
+		
+	}
     
 }

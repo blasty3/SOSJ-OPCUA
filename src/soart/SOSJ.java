@@ -26,6 +26,8 @@ import systemj.common.SJMessageConstants;
 import systemj.common.SJResponseMessage;
 import systemj.common.SJServiceRegistry;
 import systemj.common.SOAFacility.Support.SOABuffer;
+import systemj.common.opcua_milo.ClientRunner;
+import systemj.common.opcua_milo.OPCUAClientServerObjRepo;
 import systemj.common.SchedulersBuffer;
 import systemj.interfaces.Scheduler;
 import systemj.lib.input_Channel;
@@ -838,5 +840,14 @@ public class SOSJ {
         
     }
     */
+    
+    public static synchronized void SetReceiverSignal(String cdName, String signalSenderName, String signalReceiverName, String ssToConnect, String cdToConnect, String Addr, int portNum) {
+    	
+    	ClientRunner clrun = OPCUAClientServerObjRepo.GetClientObjCD(cdName, signalSenderName);
+    	clrun.SetEndpointUrl(Addr, portNum, ssToConnect, cdToConnect);
+    	clrun.SetSignalNameToConnect(signalReceiverName);
+    	OPCUAClientServerObjRepo.AddClientObjCD(cdName, signalSenderName, clrun);
+    	
+    }
     
 }

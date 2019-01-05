@@ -31,6 +31,9 @@ public interface ClientExample {
         return new AnonymousProvider();
     }
 
-    void run(OpcUaClient client, CompletableFuture<OpcUaClient> future) throws Exception;
+    /*
+     * boolean ReadOrWrite : True if read, false if write
+     */
+    void run(OpcUaClient client, String signalNameToConnect, boolean ReadOrWrite, String valueToSend, CompletableFuture<OpcUaClient> future) throws Exception;
 
 }

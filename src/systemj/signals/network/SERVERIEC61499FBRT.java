@@ -126,4 +126,9 @@ public class SERVERIEC61499FBRT extends GenericSignalReceiver implements Seriali
 	//private DatagramSocket socket = null;
         private final SERVER server = new SERVER(0,1);
         private final WSTRING rd1 = new WSTRING();
+		@Override
+		public void execute() {
+			// TODO Auto-generated method stub
+			
+		}
 }
