@@ -42,7 +42,7 @@ import systemj.interfaces.GenericSignalSender;
 public class LocalWriteOPCUA extends GenericSignalSender{
 
    
-    String SigName = null;
+    String NameToWrite = null;
     String CDName = null;
     
     UShort ush = Unsigned.ushort(2);
@@ -51,8 +51,8 @@ public class LocalWriteOPCUA extends GenericSignalSender{
     @Override
     public void configure(Hashtable data) throws RuntimeException {
         
-        if(data.containsKey("Name")){
-            SigName = (String)data.get("Name");
+        if(data.containsKey("NameToWrite")){
+        	NameToWrite = (String)data.get("NameToWrite");
         }
         
         if(data.containsKey("CDName")){
@@ -78,14 +78,14 @@ public class LocalWriteOPCUA extends GenericSignalSender{
 	   
 	    SOSJOPCUAServerNamespaceForCD sosjnamespace = (SOSJOPCUAServerNamespaceForCD) miloserv.getNamespaceManager().getNamespace(ush);
 	    
-	    UaVariableNode signalStatusNode = sosjnamespace.GetNodeObjFromStorage(SigName+":Status");
-	    UaVariableNode signalValueNode = sosjnamespace.GetNodeObjFromStorage(SigName+":Value");
+	    UaVariableNode signalStatusNode = sosjnamespace.GetNodeObjFromStorage(NameToWrite+":Status");
+	    UaVariableNode signalValueNode = sosjnamespace.GetNodeObjFromStorage(NameToWrite+":Value");
 	    
 	    signalStatusNode.setValue(new DataValue(new Variant(true)));
 	    signalValueNode.setValue(new DataValue(new Variant(data)));
 	    
-	    sosjnamespace.AddNodeObjToStorage(SigName+":Status", signalStatusNode);
-	    sosjnamespace.AddNodeObjToStorage(SigName+":Value", signalValueNode);
+	    sosjnamespace.AddNodeObjToStorage(NameToWrite+":Status", signalStatusNode);
+	    sosjnamespace.AddNodeObjToStorage(NameToWrite+":Value", signalValueNode);
 	    
         
     }

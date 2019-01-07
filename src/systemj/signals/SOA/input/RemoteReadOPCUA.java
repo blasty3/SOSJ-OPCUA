@@ -97,28 +97,45 @@ public class RemoteReadOPCUA extends GenericSignalReceiver{
 		
 		ClientRunner clrun = OPCUAClientServerObjRepo.GetClientObjCD(cdname, signalname);
 		
-		clrun.SetReadOrWrite(true);
-		
-	    clrun.InstantiateClient();
-	    
-	    clrun.SetSignalValue("");
-
-	    clrun.run();
-	    
-	    boolean signalStatus = SOSJSignalOPCUAReadSharedVariables.GetSignalStatusToRead(signalname+":Status");
-	    String signalValue = SOSJSignalOPCUAReadSharedVariables.GetSignalValueToRead(signalname+":Value");
-	    
-		if(signalStatus) {
-			obj[0] = Boolean.TRUE;
-            obj[1] = signalValue;
-            super.setBufferIncomingValue(obj);
-            SOSJSignalOPCUAReadSharedVariables.ResetSignalStatus(signalname);
-		} else {
+		if(clrun.EndpointURLNotInitialized()) {
 			
 			obj[0] = Boolean.FALSE;
-            obj[1] = signalValue;
+            obj[1] = "";
             super.setBuffer(obj);
+			
+			
+		} else {
+			
+			clrun.SetReadOrWrite(true);
+			
+		    clrun.InstantiateClient();
+		    
+		    clrun.SetSignalValue("");
+
+		    clrun.run();
+		    
+		    boolean signalStatus = SOSJSignalOPCUAReadSharedVariables.GetSignalStatusToRead(clrun.GetSignalNameToConnect());
+		    String signalValue = SOSJSignalOPCUAReadSharedVariables.GetSignalValueToRead(clrun.GetSignalNameToConnect());
+		    
+			if(signalStatus) {
+				obj[0] = Boolean.TRUE;
+	            obj[1] = signalValue;
+	            super.setBufferIncomingValue(obj);
+	            SOSJSignalOPCUAReadSharedVariables.ResetSignalStatus(clrun.GetSignalNameToConnect());
+			} else {
+				
+				obj[0] = Boolean.FALSE;
+	            obj[1] = signalValue;
+	            super.setBuffer(obj);
+			}
+			
+			clrun.DisconnectClient();
+			
+			//OPCUAClientServerObjRepo.AddClientObjCD(cdname, signalname, clrun);
+			
 		}
+		
+		
 		/*
         MiloServerCDHandler miloserv_hand = OPCUAClientServerObjRepo.GetServerObjCD(cdname);
             //obj[0] = Boolean.TRUE;

@@ -178,7 +178,7 @@ public class MiloServerCDHandler {
         
         server.getNamespaceManager().registerAndAdd(
         		SOSJOPCUAServerNamespaceForCD.NAMESPACE_URI,
-                idx -> new SOSJOPCUAServerNamespaceForCD(server, idx, "",jsSigsChans));
+                idx -> new SOSJOPCUAServerNamespaceForCD(server, idx, "Interfaces",jsSigsChans));
         
         server.getServer().addRequestHandler(TestStackRequest.class, service ->
         {

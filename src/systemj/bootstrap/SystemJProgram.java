@@ -7,6 +7,12 @@ import java.util.Hashtable;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.eclipse.milo.opcua.sdk.server.OpcUaServer;
+import org.eclipse.milo.opcua.sdk.server.nodes.UaVariableNode;
+import org.eclipse.milo.opcua.stack.core.types.builtin.DataValue;
+import org.eclipse.milo.opcua.stack.core.types.builtin.Variant;
+import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned;
 import org.json.me.JSONException;
 import org.json.me.JSONObject;
 import systemj.common.CDLCBuffer;
@@ -23,6 +29,9 @@ import systemj.common.SOAFacility.ClockDomainLifeCycleReconfigChanImpl2;
 import systemj.common.SOAFacility.ClockDomainLifeCycleSignalImpl;
 import systemj.common.SOAFacility.LinkCreationSenderHSImpl;
 import systemj.common.SOAFacility.Support.SOABuffer;
+import systemj.common.opcua_milo.MiloServerCDHandler;
+import systemj.common.opcua_milo.OPCUAClientServerObjRepo;
+import systemj.common.opcua_milo.SOSJOPCUAServerNamespaceForCD;
 import systemj.common.SOAFacility.TCPIPLinkRegistry;
 import systemj.common.SchedulersBuffer;
 
@@ -886,6 +895,18 @@ public class SystemJProgram {
                                 //update im to execute after uncoupled channels have been coupled once the partner is present and in active state
                                 
                                 im.run();
+                                
+                                /*
+                                 * OPC UA
+                                 * 
+                                 */
+                                //clear OPC UA signal output
+                                
+                                //ClearOPCUAOutputSignals();
+                                
+                               
+                                
+                                
                           //}
                           	
                       }
@@ -929,6 +950,61 @@ public class SystemJProgram {
                 collectionTime += garbageCollectorMXBean.getCollectionTime();
             }
             return collectionTime;
+        }
+        
+        
+        private void ClearOPCUAOutputSignals() {
+        	Scheduler sc = getScheduler();
+            
+            Vector allCDs = sc.getAllClockDomain();
+            
+            for(int i=0;i<allCDs.size();i++) {
+            	
+            	 ClockDomain cd = (ClockDomain) allCDs.get(i);
+            	 
+            	 String cdname = cd.getName();
+            	
+            	 MiloServerCDHandler miloserv_hand = OPCUAClientServerObjRepo.GetServerObjCD(cdname);
+                 //obj[0] = Boolean.TRUE;
+                 //obj[1] = jsAllServs.toString();
+         	     OpcUaServer miloserv = miloserv_hand.getServer();
+                 
+                 SOSJOPCUAServerNamespaceForCD sosjnamespace = (SOSJOPCUAServerNamespaceForCD) miloserv.getNamespaceManager().getNamespace(Unsigned.ushort(2));
+            	
+                 Hashtable allSigDirs = sosjnamespace.GetAllSignalDirection();
+                 
+                 Enumeration sigNameKeys = allSigDirs.keys();
+                 
+                 while(sigNameKeys.hasMoreElements()) {
+                	 
+                    String signalName = sigNameKeys.nextElement().toString();
+                    
+                    String direction = sosjnamespace.GetSignalDirection(signalName);
+                    
+                    if(direction.equalsIgnoreCase("outputs")) {
+                    	
+                    	 UaVariableNode signalStatusNode = sosjnamespace.GetNodeObjFromStorage(signalName+":Status");
+                	    //UaVariableNode signalValueNode = sosjnamespace.GetNodeObjFromStorage(key+":Value");
+                	    
+                    	 boolean signalStatus = (boolean) signalStatusNode.getValue().getValue().getValue();
+                    	 
+                    	 if(signalStatus) {
+                    		 
+                    		 signalStatusNode.setValue(new DataValue(new Variant(false)));
+                     	    //signalValueNode.setValue(new DataValue(new Variant(data)));
+                     	    
+                     	     sosjnamespace.AddNodeObjToStorage(signalName+":Status", signalStatusNode);
+                     	    //sosjnamespace.AddNodeObjToStorage(signalName+":Value", signalValueNode);
+                    		 
+                    	 }
+                    	
+                    }
+                	 
+                 }
+                 
+                 
+                 
+            }
         }
         
         /*

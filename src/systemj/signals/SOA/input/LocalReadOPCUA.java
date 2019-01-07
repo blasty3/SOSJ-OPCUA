@@ -48,10 +48,10 @@ import systemj.interfaces.GenericSignalReceiver;
  *
  * @author Atmojo
  */
-public class LocalAccessNodeOPCUA extends GenericSignalReceiver{
+public class LocalReadOPCUA extends GenericSignalReceiver{
 
     String cdname = null;
-    String signalname = null;
+    String NameToRead = null;
     
     UShort ush = Unsigned.ushort(2);
     
@@ -65,10 +65,10 @@ public class LocalAccessNodeOPCUA extends GenericSignalReceiver{
             throw new RuntimeException("the 'CDName' attribute is required");
         }
         
-        if(data.containsKey("Name")){
-            signalname = (String)data.get("Name");
+        if(data.containsKey("NameToRead")){
+            NameToRead = (String)data.get("NameToRead");
         } else {
-            throw new RuntimeException("the signalname attribute 'Name' is required");
+            throw new RuntimeException("the signalname attribute 'NameToRead' is required");
         }
         
         
@@ -78,54 +78,58 @@ public class LocalAccessNodeOPCUA extends GenericSignalReceiver{
     @Override
     public void run(){
         
+    	/*
         while(!terminated){
             
-            Object[] obj = new Object[2];
-            MiloServerCDHandler miloserv_hand = OPCUAClientServerObjRepo.GetServerObjCD(cdname);
-                //obj[0] = Boolean.TRUE;
-                //obj[1] = jsAllServs.toString();
-            OpcUaServer miloserv = miloserv_hand.getServer();
             
-           
-            SOSJOPCUAServerNamespaceForCD sosjnamespace = (SOSJOPCUAServerNamespaceForCD) miloserv.getNamespaceManager().getNamespace(ush);
-            
-            UaVariableNode signalStatusNode = sosjnamespace.GetNodeObjFromStorage(signalname+":Status");
-            UaVariableNode signalValueNode = sosjnamespace.GetNodeObjFromStorage(signalname+":Value");
-            
-            boolean signalStatus = (boolean) signalStatusNode.getValue().getValue().getValue();
-            String signalValue = (String) signalValueNode.getValue().getValue().getValue();
-            
-            if(signalStatus) {
-            	obj[0] = Boolean.TRUE;
-                obj[1] = signalValue;
-                super.setBufferIncomingValue(obj);
-            } else {
-            	obj[0] = Boolean.FALSE;
-                obj[1] = signalValue;
-                super.setBuffer(obj);
-            }
-            
-            //Optional<ServerNode> inSigStatusNode = miloserv.getNodeMap().getNode(new NodeId(2, "/Signals/Input/"+signalname+"/Status"));
-            
-            boolean IsRead = super.getIsRead();
-            
-            if(IsRead) {
-            	signalStatusNode.setValue(new DataValue(new Variant(false)));
-            	sosjnamespace.AddNodeObjToStorage(signalname+":Status", signalStatusNode);
-            	super.setIsRead(false);
-            } 
             
         }
+        */
         
     }
     
-    public LocalAccessNodeOPCUA(){
+    public LocalReadOPCUA(){
 		super(); // Initializes the buffer
     }
 
 	@Override
 	public void execute() {
 		// TODO Auto-generated method stub
+		
+		Object[] obj = new Object[2];
+        MiloServerCDHandler miloserv_hand = OPCUAClientServerObjRepo.GetServerObjCD(cdname);
+            //obj[0] = Boolean.TRUE;
+            //obj[1] = jsAllServs.toString();
+        OpcUaServer miloserv = miloserv_hand.getServer();
+        
+       
+        SOSJOPCUAServerNamespaceForCD sosjnamespace = (SOSJOPCUAServerNamespaceForCD) miloserv.getNamespaceManager().getNamespace(ush);
+        
+        UaVariableNode signalStatusNode = sosjnamespace.GetNodeObjFromStorage(NameToRead+":Status");
+        UaVariableNode signalValueNode = sosjnamespace.GetNodeObjFromStorage(NameToRead+":Value");
+        
+        boolean signalStatus = (boolean) signalStatusNode.getValue().getValue().getValue();
+        String signalValue = (String) signalValueNode.getValue().getValue().getValue();
+        
+        if(signalStatus) {
+        	obj[0] = Boolean.TRUE;
+            obj[1] = signalValue;
+            super.setBufferIncomingValue(obj);
+        } else {
+        	obj[0] = Boolean.FALSE;
+            obj[1] = signalValue;
+            super.setBuffer(obj);
+        }
+        
+        //Optional<ServerNode> inSigStatusNode = miloserv.getNodeMap().getNode(new NodeId(2, "/Signals/Input/"+signalname+"/Status"));
+        
+        boolean IsRead = super.getIsRead();
+        
+        if(IsRead) {
+        	signalStatusNode.setValue(new DataValue(new Variant(false)));
+        	sosjnamespace.AddNodeObjToStorage(NameToRead+":Status", signalStatusNode);
+        	super.setIsRead(false);
+        } 
 		
 	}
     

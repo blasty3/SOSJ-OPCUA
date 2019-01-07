@@ -166,7 +166,7 @@ public class MiloServerSSHandler {
                 ImmutableList.of(
                     USER_TOKEN_POLICY_ANONYMOUS,
                     USER_TOKEN_POLICY_USERNAME))
-            .setDiscoveryServerEnabled(false)
+            .setDiscoveryServerEnabled(true)
             .setMulticastEnabled(true)
             .build();
 

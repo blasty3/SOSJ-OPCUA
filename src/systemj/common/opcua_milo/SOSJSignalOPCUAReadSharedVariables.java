@@ -12,14 +12,14 @@ public class SOSJSignalOPCUAReadSharedVariables {
 	
 	public static void AddForSignalsToRead(String signalName, boolean signalStatus, String signalValue) {
 		synchronized(SOSJSignalsCommLock) {
-			SOSJSignalsComm.put(signalName+":Status", new Boolean(signalStatus));
+			SOSJSignalsComm.put(signalName+":Status", signalStatus);
 			SOSJSignalsComm.put(signalName+":Value", signalValue);
 		}
 	}
 	
 	public static boolean GetSignalStatusToRead(String signalName) {
 		synchronized(SOSJSignalsCommLock) {
-			 boolean status = ((Boolean) SOSJSignalsComm.get(signalName+":Status")).booleanValue();
+			 boolean status = ((boolean) SOSJSignalsComm.get(signalName+":Status"));
 			 SOSJSignalsComm.put(signalName+":Status", Boolean.FALSE);
 			 return status;
 		}

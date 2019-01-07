@@ -70,6 +70,8 @@ public class RemoteWriteOPCUA extends GenericSignalSender{
 
 	    clrun.run();
 	    
+	    clrun.DisconnectClient();
+	    
         
     }
     

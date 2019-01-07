@@ -85,6 +85,8 @@ public class SOSJOPCUAServerNamespaceForCD implements Namespace {
     
     private Hashtable SOSJSignalNodes = new Hashtable();
     private final static Object SOSJSignalNodesLock = new Object();
+    private Hashtable SOSJSignalNodeDirections = new Hashtable();
+    private final static Object SOSJSignalNodeDirectionsLock = new Object();
 
     private static final Object[][] STATIC_SCALAR_NODES = new Object[][]{
     	/*
@@ -195,6 +197,17 @@ public class SOSJOPCUAServerNamespaceForCD implements Namespace {
 				JSONObject jsInputSigs = jsSignals.getJSONObject("inputs");
 				JSONObject jsOutputSigs = jsSignals.getJSONObject("outputs");
 				
+				//add signal folder
+				
+				UaFolderNode SignalsNode = addHierarchyFolderNode(folderNode, "Signals", "Interfaces");
+				
+				// add signal direction folder
+				
+				UaFolderNode InSignalsNode = addHierarchyFolderNode(SignalsNode, "Inputs", "Signals");
+				
+				UaFolderNode OutSignalsNode = addHierarchyFolderNode(SignalsNode, "Outputs", "Signals");
+				
+				
 				//For inputs
 				
 				   Enumeration inSigKeys = jsInputSigs.keys();
@@ -203,7 +216,8 @@ public class SOSJOPCUAServerNamespaceForCD implements Namespace {
 		               
 		               String inSigName = inSigKeys.nextElement().toString();
 		               
-		               addDynamicNodesForSignals(folderNode, inSigName,"Input");
+		             
+		               addDynamicNodesForSignals(InSignalsNode, inSigName,"Input");
 		               
 		           }
 		            
@@ -215,7 +229,19 @@ public class SOSJOPCUAServerNamespaceForCD implements Namespace {
 		               
 		               String outSigName = outSigKeys.nextElement().toString();
 		               
-		               addDynamicNodesForSignals(folderNode, outSigName,"Output");
+		               JSONObject jsOutSigDet = jsOutputSigs.getJSONObject(outSigName);
+		               
+		               String className = jsOutSigDet.getString("Class");
+		               
+		                  if(className.equalsIgnoreCase("systemj.signals.SOA.output.LocalWriteOPCUA")) {
+		            	   
+		                  } else {
+		                	  
+		                	  addDynamicNodesForSignals(OutSignalsNode, outSigName,"Output");
+		                	  
+		                  }
+		               
+		               
 		               
 		           }
 				
@@ -417,13 +443,26 @@ public class SOSJOPCUAServerNamespaceForCD implements Namespace {
         server.getNodeMap().addNode(node);
         adminFolder.addOrganizes(node);
     }
+    
+    private UaFolderNode addHierarchyFolderNode(UaFolderNode rootNode, String Name, String precedingName) {
+        UaFolderNode dynamicFolder = new UaFolderNode(
+            server.getNodeMap(),
+            new NodeId(namespaceIndex, rootNode+"/"+precedingName+"/"+Name),
+            new QualifiedName(namespaceIndex, Name),
+            LocalizedText.english(Name)
+        );
+
+        server.getNodeMap().addNode(dynamicFolder);
+        rootNode.addOrganizes(dynamicFolder);
+        return dynamicFolder;
+    }
 
     private void addDynamicNodesForSignals(UaFolderNode rootNode, String signalName, String signalDirection) {
         UaFolderNode dynamicFolder = new UaFolderNode(
             server.getNodeMap(),
-            new NodeId(namespaceIndex, folderName+"/Signals"),
-            new QualifiedName(namespaceIndex, "Signals"),
-            LocalizedText.english("Signals")
+            new NodeId(namespaceIndex, folderName+"/Signals/"+signalDirection+"/"+signalName),
+            new QualifiedName(namespaceIndex, signalName),
+            LocalizedText.english(signalName)
         );
 
         server.getNodeMap().addNode(dynamicFolder);
@@ -538,10 +577,11 @@ public class SOSJOPCUAServerNamespaceForCD implements Namespace {
             Variant variant = new Variant(signalName);
 
             UaVariableNode nodeSignalName = new UaVariableNode.UaVariableNodeBuilder(server.getNodeMap())
-                .setNodeId(new NodeId(namespaceIndex, folderName+"/Signals/"+signalDirection+"/"+name))
+                .setNodeId(new NodeId(namespaceIndex, folderName+"/Signals/"+signalDirection+"/"+name+"/Name"))
                 .setAccessLevel(ubyte(AccessLevel.getMask(AccessLevel.READ_ONLY)))
+                .setUserAccessLevel(ubyte(AccessLevel.getMask(AccessLevel.READ_ONLY)))
                 .setBrowseName(new QualifiedName(namespaceIndex, name))
-                .setDisplayName(LocalizedText.english(name))
+                .setDisplayName(LocalizedText.english("Name"))
                 .setDataType(typeId)
                 .setTypeDefinition(Identifiers.BaseDataVariableType)
                 .build();
@@ -571,6 +611,7 @@ public class SOSJOPCUAServerNamespaceForCD implements Namespace {
             dynamicFolder.addOrganizes(nodeSignalName);
             
             AddNodeObjToStorage(signalName+":Name", nodeSignalName);
+            AddSignalDirectionEntry(signalName, signalDirection);
             
         }
         
@@ -582,9 +623,10 @@ public class SOSJOPCUAServerNamespaceForCD implements Namespace {
 
             UaVariableNode nodeSignalStatus = new UaVariableNode.UaVariableNodeBuilder(server.getNodeMap())
             	.setNodeId(new NodeId(namespaceIndex, folderName+"/Signals/"+signalDirection+"/"+signalName+"/Status"))
-                .setAccessLevel(ubyte(AccessLevel.getMask(AccessLevel.READ_ONLY)))
-                .setBrowseName(new QualifiedName(namespaceIndex, signalName+"Status"))
-                .setDisplayName(LocalizedText.english(signalName+"Status"))
+                .setAccessLevel(ubyte(AccessLevel.getMask(AccessLevel.READ_WRITE)))
+                .setUserAccessLevel(ubyte(AccessLevel.getMask(AccessLevel.READ_WRITE)))
+                .setBrowseName(new QualifiedName(namespaceIndex, signalName+":Status"))
+                .setDisplayName(LocalizedText.english("Status"))
                 .setDataType(typeId)
                 .setTypeDefinition(Identifiers.BaseDataVariableType)
                 .build();
@@ -601,9 +643,12 @@ public class SOSJOPCUAServerNamespaceForCD implements Namespace {
                 },
                 ValueLoggingDelegate::new
             );
-
+			
+			
             nodeSignalStatus.setAttributeDelegate(delegate);
             */
+            
+            
             nodeSignalStatus.setAttributeDelegate(new ValueLoggingDelegate());
 
             server.getNodeMap().addNode(nodeSignalStatus);
@@ -622,8 +667,9 @@ public class SOSJOPCUAServerNamespaceForCD implements Namespace {
             UaVariableNode nodeSignalValue = new UaVariableNode.UaVariableNodeBuilder(server.getNodeMap())
                 .setNodeId(new NodeId(namespaceIndex, folderName+"/Signals/"+signalDirection+"/"+signalName+"/Value"))
                 .setAccessLevel(ubyte(AccessLevel.getMask(AccessLevel.READ_WRITE)))
-                .setBrowseName(new QualifiedName(namespaceIndex, signalName+"Value"))
-                .setDisplayName(LocalizedText.english(signalName+"Value"))
+                .setUserAccessLevel(ubyte(AccessLevel.getMask(AccessLevel.READ_WRITE)))
+                .setBrowseName(new QualifiedName(namespaceIndex, signalName+":Value"))
+                .setDisplayName(LocalizedText.english("Value"))
                 .setDataType(typeId)
                 .setTypeDefinition(Identifiers.BaseDataVariableType)
                 .build();
@@ -859,6 +905,24 @@ public class SOSJOPCUAServerNamespaceForCD implements Namespace {
     public UaVariableNode GetNodeObjFromStorage(String nodeSignalName) {
     	synchronized(SOSJSignalNodesLock) {
     		return (UaVariableNode) SOSJSignalNodes.get(nodeSignalName);
+    	}
+    }
+    
+    public void AddSignalDirectionEntry(String signalName, String direction) {
+    	synchronized(SOSJSignalNodeDirectionsLock) {
+    		SOSJSignalNodeDirections.put(signalName, direction);
+    	}
+    }
+    
+    public String GetSignalDirection(String signalName) {
+    	synchronized(SOSJSignalNodeDirectionsLock) {
+    		return SOSJSignalNodeDirections.get(signalName).toString();
+    	}
+    }
+    
+    public Hashtable GetAllSignalDirection() {
+    	synchronized(SOSJSignalNodeDirectionsLock) {
+    		return SOSJSignalNodeDirections;
     	}
     }
 

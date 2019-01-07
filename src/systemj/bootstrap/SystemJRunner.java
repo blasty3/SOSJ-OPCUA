@@ -337,8 +337,11 @@ public class SystemJRunner
                                         printSOSJNoCDUsage();
                                         System.exit(1);
                                     } else {
+                                    	
+                                    	 filename = args[i+1];
+                                    	 System.out.println("filename: " +filename);
                                     	//here
-                                    GtwyAddr = args[i+1];
+                                    //GtwyAddr = args[i+1];
                                     //SubnetMask = args[i+2];
                                     //SSName = args[i+2];
                                     //System.out.println("SS name: " +SSName);

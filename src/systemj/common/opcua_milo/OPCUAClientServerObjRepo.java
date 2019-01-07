@@ -58,6 +58,9 @@ public class OPCUAClientServerObjRepo {
 	public static void AddClientObjCD(String CLCDName, String CLSigName, ClientRunner OPCUAClientRunnerObj){
         synchronized(OpcUaClientsCDLock){
         	
+        	OpcUaClientsCD.put(CLCDName+":"+CLSigName,OPCUAClientRunnerObj);
+        	
+        	/*
         	if(OpcUaClientsCD.containsKey(CLCDName)) {
         		
         		Hashtable clcdnameSigs = (Hashtable) OpcUaClientsCD.get(CLCDName);
@@ -74,14 +77,18 @@ public class OPCUAClientServerObjRepo {
         		OpcUaClientsCD.put(CLCDName,clcdnameSigs);
         		
         	}
+        	*/
         	
         	//OpcUaClientsCD.put(CLCDName, OPCUAClientRunnerObj);
         }
     }
 	
-	public static void RemoveClientObjCD(String CLCDName, String CLName){
+	public static void RemoveClientObjCD(String CLCDName, String sigName){
         synchronized(OpcUaClientsCDLock){
         	
+        	OpcUaClientsCD.remove(CLCDName+":"+sigName);
+        	
+        	/*
         	if(OpcUaClientsCD.containsKey(CLCDName)) {
         		
         		Hashtable clcdnameSigs = (Hashtable) OpcUaClientsCD.get(CLCDName);
@@ -91,15 +98,18 @@ public class OPCUAClientServerObjRepo {
         		OpcUaClientsCD.put(CLCDName, clcdnameSigs);
         		
         	}
+        	*/
         	
-        	
-        	//
         }
     }
 	
 	public static ClientRunner GetClientObjCD(String CLCDName, String CLName){
         synchronized(OpcUaClientsCDLock){
         	
+        	
+        	return (ClientRunner) OpcUaClientsCD.get(CLCDName+":"+CLName);
+        	
+        	/*
         	if(OpcUaClientsCD.containsKey(CLCDName)) {
         		Hashtable hashSigList = (Hashtable)OpcUaClientsCD.get(CLCDName);
         		return (ClientRunner) hashSigList.get(CLName);
@@ -107,6 +117,7 @@ public class OPCUAClientServerObjRepo {
         	} else {
         		return new ClientRunner();
         	}
+        	*/
         	
         	
         }

@@ -841,12 +841,23 @@ public class SOSJ {
     }
     */
     
-    public static synchronized void SetReceiverSignal(String cdName, String signalSenderName, String signalReceiverName, String ssToConnect, String cdToConnect, String Addr, int portNum) {
+    public static synchronized void SetSignalForWrite(String cdName, String signalSenderName, String signalReceiverName, String destinationDirection, String ssToConnect, String cdToConnect, String Addr, int portNum) {
     	
     	ClientRunner clrun = OPCUAClientServerObjRepo.GetClientObjCD(cdName, signalSenderName);
     	clrun.SetEndpointUrl(Addr, portNum, ssToConnect, cdToConnect);
     	clrun.SetSignalNameToConnect(signalReceiverName);
+    	clrun.SetTargetDirection(destinationDirection);
     	OPCUAClientServerObjRepo.AddClientObjCD(cdName, signalSenderName, clrun);
+    	
+    }
+    
+    public static synchronized void SetSignalForRead(String cdName, String invokingSignal, String signalToRead, String destinationDirection, String ssToConnect, String cdToConnect, String Addr, int portNum) {
+    	
+    	ClientRunner clrun = OPCUAClientServerObjRepo.GetClientObjCD(cdName, invokingSignal);
+    	clrun.SetEndpointUrl(Addr, portNum, ssToConnect, cdToConnect);
+    	clrun.SetSignalNameToConnect(signalToRead);
+    	clrun.SetTargetDirection(destinationDirection);
+    	OPCUAClientServerObjRepo.AddClientObjCD(cdName, invokingSignal, clrun);
     	
     }
     

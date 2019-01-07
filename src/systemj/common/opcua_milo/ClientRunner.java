@@ -3,6 +3,8 @@ package systemj.common.opcua_milo;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.milo.examples.server.KeyStoreLoader;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.sdk.client.api.config.OpcUaClientConfig;
@@ -21,16 +23,18 @@ public class ClientRunner
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private final CompletableFuture<OpcUaClient> future = new CompletableFuture<>();
   private final KeyStoreLoader loader = new KeyStoreLoader();
-  private String endpointUrl;
+  private String endpointUrl= "";
   private ClientExample uaClient;
   
   private boolean ReadOrWrite;
   
   private OpcUaClient opcuaclient;
-  private String ssNameToConnect;
-  private String cdnameToConnect;
+  private String ssNameToConnect = "";
+  private String cdnameToConnect = "";
   
-  private String signalNameToConnect;
+  private String Direction;
+  
+  private String signalNameToConnect = "";
   private String signalValue;
 
   
@@ -49,9 +53,9 @@ public class ClientRunner
   public ClientRunner(String Addr, int portNum, String ssname, String cdname, ClientExample clientExample)
   {
     //this.endpointUrl = endpointUrl;
-	this.endpointUrl = "opc.tcp://"+Addr+":"+portNum+"/"+ssname+"/"+cdname;
-	this.ssNameToConnect = ssname;
-	this.cdnameToConnect = cdname;
+	this.endpointUrl = ("opc.tcp://"+Addr+":"+portNum+"/"+ssname+"/"+cdname);
+	this.ssNameToConnect = (ssname);
+	this.cdnameToConnect = (cdname);
     this.uaClient = clientExample;
   }
   
@@ -59,27 +63,46 @@ public class ClientRunner
   {
     //this.endpointUrl = endpointUrl;
 	//this.endpointUrl = "opc.tcp://"+Addr+":"+portNum+"/"+ssname+"/"+cdname;
-	this.ssNameToConnect = ssname;
-	this.cdnameToConnect = cdname;
+	this.ssNameToConnect = (ssname);
+	this.cdnameToConnect = (cdname);
     this.uaClient = clientExample;
   }
   
   public void SetEndpointUrl(String Addr, int portNum) {
-	  this.endpointUrl = "opc.tcp://"+Addr+":"+portNum+"/"+ssNameToConnect+"/"+cdnameToConnect;
+	  this.endpointUrl = ("opc.tcp://"+Addr+":"+portNum+"/"+ssNameToConnect+"/"+cdnameToConnect);
   }
   
   public void SetReadOrWrite(boolean ReadOrWrite) {
 	  this.ReadOrWrite = ReadOrWrite;
   }
   
+  public void SetTargetDirection(String direction) {
+	  this.Direction = direction;
+  }
+  
+  
   public void SetEndpointUrl(String Addr, int portNum, String ssNameDestination, String cdNameDestination) {
-	  this.ssNameToConnect = ssNameDestination;
-	  this.cdnameToConnect = cdNameDestination;
-	  this.endpointUrl = "opc.tcp://"+Addr+":"+portNum+"/"+ssNameToConnect+"/"+cdnameToConnect;
+	  this.ssNameToConnect = (ssNameDestination);
+	  this.cdnameToConnect = (cdNameDestination);
+	  this.endpointUrl = ("opc.tcp://"+Addr+":"+portNum+"/"+ssNameDestination+"/"+cdNameDestination);
+	  //System.out.println("ClientRunner, SetEndpointUrl invoked 1, endpointUrl: " +this.endpointUrl);
+	  System.out.println("ClientRunner, SetEndpointUrl invoked, endpointUrl: " +endpointUrl);
+  }
+  
+  public boolean EndpointURLNotInitialized() {
+	  if(endpointUrl.length()==0) {
+		  return true;
+	  } else {
+		  return false;
+	  }
   }
   
   public void SetSignalNameToConnect(String signalNameToConnect){
-	  this.signalNameToConnect = signalNameToConnect;
+	  this.signalNameToConnect = (signalNameToConnect);
+  }
+  
+  public String GetSignalNameToConnect() {
+	  return signalNameToConnect;
   }
   
   public void SetSignalValue(String value) {
@@ -91,6 +114,8 @@ public class ClientRunner
     SecurityPolicy securityPolicy = uaClient.getSecurityPolicy();
     
     //EndpointDescription[] endpoints = UaTcpStackClient.getEndpoints("opc.tcp://localhost:12686/example").get();
+    
+    System.out.println("ClientRunner, endpoint url: " +endpointUrl);
     
     EndpointDescription[] endpoints = UaTcpStackClient.getEndpoints(endpointUrl).get();
     
@@ -127,12 +152,14 @@ public class ClientRunner
             .build();
     
     opcuaclient = new OpcUaClient(config);
-
+    
     return opcuaclient;
   }
 
-  public void run()
+  public boolean run()
   {
+	
+	
     future.whenComplete((opcuaclient, ex)
             ->
     {
@@ -142,12 +169,15 @@ public class ClientRunner
         {
           
           opcuaclient.disconnect().get();
-          Stack.releaseSharedResources();
+          //Stack.releaseSharedResources();
         } catch (InterruptedException | ExecutionException e)
         {
           logger.error("Error disconnecting:", e.getMessage(), e);
         }
-      } else
+        
+       
+      } 
+      else
       {
         logger.error("Error running example: {}", ex.getMessage(), ex);
         Stack.releaseSharedResources();
@@ -160,12 +190,15 @@ public class ClientRunner
 
       try
       {
-        uaClient.run(opcuaclient, signalNameToConnect,ReadOrWrite, signalValue, future);
+        uaClient.run(opcuaclient, signalNameToConnect, ReadOrWrite, Direction,signalValue, future);
+        //future.get(500, TimeUnit.MILLISECONDS);
+        return true;
       } 
       catch (Exception t)
       {
         logger.error("Error running client example: {}", t.getMessage(), t);
         future.complete(opcuaclient);
+        return false;
       }
     } 
     //catch (Exception t)
@@ -178,13 +211,34 @@ public class ClientRunner
 	  return opcuaclient;
   }
   
-  public void TerminateClient() {
+  public void DisconnectClient() {
 	  if (opcuaclient != null)
       {
         try
         {
          opcuaclient.disconnect().get();
+          //Stack.releaseSharedResources();
+        } catch (InterruptedException | ExecutionException e)
+        {
+          logger.error("Error disconnecting:", e.getMessage(), e);
+        }
+      } 
+	  else
+      {
+        logger.error("Error running example: {}");
+        Stack.releaseSharedResources();
+      }
+  }
+  
+  
+  public void TerminateClient() {
+	  if (opcuaclient != null)
+      {
+        try
+        {
+          opcuaclient.disconnect().get();
           Stack.releaseSharedResources();
+          opcuaclient = null;
         } catch (InterruptedException | ExecutionException e)
         {
           logger.error("Error disconnecting:", e.getMessage(), e);
@@ -207,7 +261,7 @@ public class ClientRunner
 	        try
 	        {
 	          client.disconnect().get();
-	          Stack.releaseSharedResources();
+	          //Stack.releaseSharedResources();
 	        } catch (InterruptedException | ExecutionException e)
 	        {
 	          logger.error("Error disconnecting:", e.getMessage(), e);
@@ -219,13 +273,18 @@ public class ClientRunner
 	      }
 	    });
 
-	    try
-	    {
-	      createClient();
-
-	    } catch (Exception t)
-	    {
-	      future.completeExceptionally(t);
-	    }
+		  if (opcuaclient != null) {
+			  
+		  } else {
+			  try
+			    {
+			      createClient();
+	
+			    } catch (Exception t)
+			    {
+			      future.completeExceptionally(t);
+			    }
+		  }
+	  
 	  }
   }

@@ -23,8 +23,10 @@ public class ClientExampleRunSOSJ implements ClientExample{
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Override
-	public void run(OpcUaClient client, String signalNameToConnect, boolean ReadOrWrite, String valueToSend, CompletableFuture<OpcUaClient> future) throws Exception {
+	public void run(OpcUaClient client, String signalNameToConnect, boolean ReadOrWrite, String Direction, String valueToSend, CompletableFuture<OpcUaClient> future) throws Exception {
 		// TODO Auto-generated method stub
+		
+		
 		
 		client.connect().get();
 
@@ -55,10 +57,18 @@ public class ClientExampleRunSOSJ implements ClientExample{
 			
 			*/
 			
+			String direction = "";
+			
+			if(Direction.equalsIgnoreCase("input")) {
+				direction = "Input";
+			} else if(Direction.equalsIgnoreCase("output")) {
+				direction = "Output";
+			}
+			
 			// connect to signal status
 			
-			VariableNode nodeSignalStatus = client.getAddressSpace().createVariableNode(new NodeId(2, "/Signals/Output/"+signalNameToConnect+"/Status"));
-			VariableNode nodeSignalValue = client.getAddressSpace().createVariableNode(new NodeId(2, "/Signals/Output/"+signalNameToConnect+"/Value"));
+			VariableNode nodeSignalStatus = client.getAddressSpace().createVariableNode(new NodeId(2, "Interfaces/Signals/"+direction+"/"+signalNameToConnect+"/Status"));
+			VariableNode nodeSignalValue = client.getAddressSpace().createVariableNode(new NodeId(2, "Interfaces/Signals/"+direction+"/"+signalNameToConnect+"/Value"));
 			// connect to signal status
 			//List<NodeId> nodeIdsSignalStatus = ImmutableList.of(new NodeId(2, "/Signals/Output/"+signalNameToConnect+"/Status"));
 	        
@@ -66,7 +76,7 @@ public class ClientExampleRunSOSJ implements ClientExample{
 			DataValue valueDatVal = nodeSignalValue.readValue().get();
 			
 			
-			boolean signalStatus = ((Boolean) statusDatVal.getValue().getValue()).booleanValue();
+			boolean signalStatus = (boolean) statusDatVal.getValue().getValue();
 			String signalValue = valueDatVal.getValue().getValue().toString();
 			
 			
@@ -82,7 +92,16 @@ public class ClientExampleRunSOSJ implements ClientExample{
 			//if write
 			
 			// connect to signal status
-			List<NodeId> nodeIdsSignalStatus = ImmutableList.of(new NodeId(2, "/Signals/Input/"+signalNameToConnect+"/Status"));
+				
+			String direction = "";
+			
+			if(Direction.equalsIgnoreCase("input")) {
+				direction = "Input";
+			} else if(Direction.equalsIgnoreCase("output")) {
+				direction = "Output";
+			}
+			
+			List<NodeId> nodeIdsSignalStatus = ImmutableList.of(new NodeId(2, "Interfaces/Signals/"+direction+"/"+signalNameToConnect+"/Status"));
 	        
 			Variant vStatus = new Variant(true);
 			
@@ -104,7 +123,7 @@ public class ClientExampleRunSOSJ implements ClientExample{
 			
 			//connect to signal value
 			
-			List<NodeId> nodeIdsSignalValue = ImmutableList.of(new NodeId(2, "/Signals/Input/"+signalNameToConnect+"/Value"));
+			List<NodeId> nodeIdsSignalValue = ImmutableList.of(new NodeId(2, "Interfaces/Signals/"+direction+"/"+signalNameToConnect+"/Value"));
 	        
 			 Variant vValue = new Variant(valueToSend);
 
@@ -151,9 +170,7 @@ public class ClientExampleRunSOSJ implements ClientExample{
 			
 			
 		}
-		
-		
-		
+				
 	}
 	
 	private CompletableFuture<List<DataValue>> readAsyncSignalStatus(OpcUaClient client, String folderName) {

@@ -34,6 +34,6 @@ public interface ClientExample {
     /*
      * boolean ReadOrWrite : True if read, false if write
      */
-    void run(OpcUaClient client, String signalNameToConnect, boolean ReadOrWrite, String valueToSend, CompletableFuture<OpcUaClient> future) throws Exception;
+    void run(OpcUaClient client, String signalNameToConnect, boolean ReadOrWrite, String Direction, String valueToSend, CompletableFuture<OpcUaClient> future) throws Exception;
 
 }
