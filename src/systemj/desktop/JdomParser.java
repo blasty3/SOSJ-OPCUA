@@ -1391,36 +1391,7 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
                                     else {
                                         
                                     	
-                                    	if(port.getAttributeValue("Class").equalsIgnoreCase("systemj.signals.SOA.input.RemoteReadOPCUA")) {
-                                        	
-                                        	String sigName = port.getAttributeValue("Name");
-                                        	// Create Milo Client?
-                                        	
-                                        	try {
-                                        		
-                                        		ClientExampleRunSOSJ icl = new ClientExampleRunSOSJ();
-                                    			
-                                    			//clrun = new ClientRunner(OwnAddr, ClPort, ssname, cdname, icl);
-                                    			
-                                        		//clrun = new ClientRunner(ssname,cdname,icl);
-                                        		ClientRunner clrun = new ClientRunner(icl);
-                                        		
-                                    			//clrun.InstantiateClient();
-                                    			
-                                    	        OPCUAClientServerObjRepo.AddClientObjCD(cdname,sigName, clrun);
-                                    	        //final CompletableFuture<Void> future = new CompletableFuture<>();
-
-                                    	        //Runtime.getRuntime().addShutdownHook(new Thread(() -> server.shutdown().thenRun(() -> future.complete(null))));
-
-                                    	        //future.get();
-                                    	        
-                                    		} catch (Exception e) {
-                                    			// TODO Auto-generated catch block
-                                    			e.printStackTrace();
-                                    		}
-                                        	
-                                        	
-                                        }
+                                    	
                                     	
                                     	
                                         server = (GenericSignalReceiver) Class.forName(port.getAttributeValue("Class")).newInstance();
@@ -1491,7 +1462,7 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
                                         
                                     } else {
                                         
-                                    	if(port.getAttributeValue("Class").equalsIgnoreCase("systemj.signals.SOA.output.RemoteWriteOPCUA")) {
+                                    	if (port.getAttributeValue("Class").equalsIgnoreCase("systemj.signals.SOA.output.RemoteWriteOPCUA") || port.getAttributeValue("Class").equalsIgnoreCase("systemj.signals.SOA.output.RemoteReadOPCUASender")) {
                                         	
                                         	String sigName = port.getAttributeValue("Name");
                                         	// Create Milo Client?
@@ -1520,7 +1491,7 @@ public ClockDomain parseClockDomain(Element cd, String ssname, Hashtable channel
                                     		}
                                         	
                                         	
-                                        }
+                                        } 
                                     	
                                     	
                                         client = (GenericSignalSender) Class.forName(port.getAttributeValue("Class")).newInstance();

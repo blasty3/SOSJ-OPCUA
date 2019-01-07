@@ -129,7 +129,7 @@ public class RemoteReadOPCUA extends GenericSignalReceiver{
 	            super.setBuffer(obj);
 			}
 			
-			clrun.DisconnectClient();
+			//clrun.DisconnectClient();
 			
 			//OPCUAClientServerObjRepo.AddClientObjCD(cdname, signalname, clrun);
 			

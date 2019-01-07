@@ -35,6 +35,10 @@ public class ClientRunner
   private String Direction;
   
   private String signalNameToConnect = "";
+  
+  //for reading operation
+  private String signalNameForReading = "";
+  
   private String signalValue;
 
   
@@ -101,8 +105,16 @@ public class ClientRunner
 	  this.signalNameToConnect = (signalNameToConnect);
   }
   
+  public void SetSignalNameForRead(String signalNameForRead){
+	  this.signalNameForReading = (signalNameForRead);
+  }
+  
   public String GetSignalNameToConnect() {
 	  return signalNameToConnect;
+  }
+  
+  public String GetSignalNameForRead() {
+	  return signalNameForReading;
   }
   
   public void SetSignalValue(String value) {
@@ -190,7 +202,7 @@ public class ClientRunner
 
       try
       {
-        uaClient.run(opcuaclient, signalNameToConnect, ReadOrWrite, Direction,signalValue, future);
+        uaClient.run(opcuaclient, signalNameToConnect,ReadOrWrite, Direction,signalValue, future);
         //future.get(500, TimeUnit.MILLISECONDS);
         return true;
       } 
@@ -237,7 +249,7 @@ public class ClientRunner
         try
         {
           opcuaclient.disconnect().get();
-          Stack.releaseSharedResources();
+          //Stack.releaseSharedResources();
           opcuaclient = null;
         } catch (InterruptedException | ExecutionException e)
         {

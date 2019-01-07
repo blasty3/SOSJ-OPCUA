@@ -32,7 +32,7 @@ public abstract class GenericSignalReceiver implements Runnable
 			obj[i] = buffer[i];
 		}
 		
-		buffer[0] = Boolean.FALSE; // After reading always set the signal status to false
+		//buffer[0] = Boolean.FALSE; // After reading always set the signal status to false
 	}
 	public synchronized void setBuffer(Object[] obj){
 		if(buffer.length < obj.length)

@@ -851,11 +851,11 @@ public class SOSJ {
     	
     }
     
-    public static synchronized void SetSignalForRead(String cdName, String invokingSignal, String signalToRead, String destinationDirection, String ssToConnect, String cdToConnect, String Addr, int portNum) {
+    public static synchronized void SetSignalForRead(String cdName, String invokingSignal, String remoteSignalToRead, String destinationDirection, String ssToConnect, String cdToConnect, String Addr, int portNum) {
     	
     	ClientRunner clrun = OPCUAClientServerObjRepo.GetClientObjCD(cdName, invokingSignal);
     	clrun.SetEndpointUrl(Addr, portNum, ssToConnect, cdToConnect);
-    	clrun.SetSignalNameToConnect(signalToRead);
+    	clrun.SetSignalNameToConnect(remoteSignalToRead);
     	clrun.SetTargetDirection(destinationDirection);
     	OPCUAClientServerObjRepo.AddClientObjCD(cdName, invokingSignal, clrun);
     	

@@ -233,7 +233,7 @@ public class SOSJOPCUAServerNamespaceForCD implements Namespace {
 		               
 		               String className = jsOutSigDet.getString("Class");
 		               
-		                  if(className.equalsIgnoreCase("systemj.signals.SOA.output.LocalWriteOPCUA")) {
+		                  if(className.equalsIgnoreCase("systemj.signals.SOA.output.LocalWriteOPCUA") || className.equalsIgnoreCase("systemj.signals.SOA.output.RemoteReadOPCUASender")) {
 		            	   
 		                  } else {
 		                	  

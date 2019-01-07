@@ -82,9 +82,6 @@ public class ClientExampleRunSOSJ implements ClientExample{
 			
 			SOSJSignalOPCUAReadSharedVariables.AddForSignalsToRead(signalNameToConnect, signalStatus, signalValue);
 			
-			
-			
-
 	        future.complete(client);
 			
 			
@@ -166,10 +163,16 @@ public class ClientExampleRunSOSJ implements ClientExample{
 	        */
 
 	        future.complete(client);
+	        
+	        
 			
 			
 			
 		}
+		
+		client.disconnect().get();
+		
+		
 				
 	}
 	

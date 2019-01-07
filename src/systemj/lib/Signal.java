@@ -156,5 +156,6 @@ public class Signal implements Serializable{
 	public void setpreval(Object ob){pre_val = ob; if(partner != null) partner.pre_val  = ob; }
 	public int setprepresent() {pre_status = true; if(partner != null) partner.pre_status = true; return 0;}
 	public int setpreclear() {pre_status = false; if(partner != null) partner.pre_status = false; return 0;}
-	public boolean getprestatus(){return pre_status;}
+	public boolean getprestatus(){
+		return pre_status;}
 }

@@ -32,7 +32,7 @@ import systemj.interfaces.GenericSignalSender;
  *
  * @author Atmojo
  */
-public class RemoteWriteOPCUA extends GenericSignalSender{
+public class RemoteReadOPCUASender extends GenericSignalSender{
 
     DatagramSocket s1 = null;
     String SigName = null;
@@ -55,18 +55,18 @@ public class RemoteWriteOPCUA extends GenericSignalSender{
     public void run() {
         
     	Object[] obj = super.buffer;
-		String data = (String) obj[1];
+		//String data = (String) obj[1];
 		
 		// 02.01.2019 Udayanto
 		//before hand, (re-)configuration of the client should occur first at the application level.
 		
 		ClientRunner clrun = OPCUAClientServerObjRepo.GetClientObjCD(CDName, SigName);
 		
-		clrun.SetReadOrWrite(false);
+		clrun.SetReadOrWrite(true);
 		
 	    clrun.InstantiateClient();
 	    
-	    clrun.SetSignalValue(data);
+	    clrun.SetSignalValue("");
 
 	    clrun.run();
 	    
