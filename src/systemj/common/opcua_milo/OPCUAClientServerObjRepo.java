@@ -51,6 +51,12 @@ public class OPCUAClientServerObjRepo {
         }
     }
 	
+	public static MiloServerSSHandler GetServerObjSS(String SSName){
+        synchronized(OpcUaServersSSLock){
+        	return (MiloServerSSHandler) OpcUaServersSS.get(SSName);
+        }
+    }
+	
 	
 	//For CD Client
 	

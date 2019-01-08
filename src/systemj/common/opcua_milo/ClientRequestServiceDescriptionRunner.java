@@ -116,7 +116,7 @@ public class ClientRequestServiceDescriptionRunner {
 
             try {
                 clientExample.run(client, future, name);
-                future.get(5, TimeUnit.SECONDS);
+                //future.get(5, TimeUnit.SECONDS);
             } catch (Throwable t) {
                 logger.error("Error running client example: {}", t.getMessage(), t);
                 future.complete(client);

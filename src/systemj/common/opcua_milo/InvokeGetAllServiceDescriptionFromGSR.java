@@ -38,12 +38,7 @@ import static org.eclipse.milo.opcua.stack.core.util.ConversionUtil.l;
 
 public class InvokeGetAllServiceDescriptionFromGSR implements ClientTemplateSS {
 
-	String GSR_Addr_To_Write = "";
-	String
 	
-	public void SetGSRValue(String GSR_Addr) {
-		this.GSR_Addr_To_Write = GSR_Addr;
-	}
 	
 	public void execute(String Addr, int port, String name) throws Exception {
     //public static void main(String[] args) throws Exception {
@@ -69,6 +64,7 @@ public class InvokeGetAllServiceDescriptionFromGSR implements ClientTemplateSS {
             try {
             	JSONObject jsRes = new JSONObject(new JSONTokener(res));
 				SJServiceRegistry.AddServicesToGSR(jsRes);
+				SOSJSignalOPCUAReadSharedVariables.AddForSignalsToRead("SOSJOPCUADisc", true, "");
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -85,6 +81,8 @@ public class InvokeGetAllServiceDescriptionFromGSR implements ClientTemplateSS {
 			}
             future.complete(client);
         });
+        
+        
     }
 
     private CompletableFuture<String> InvokeGetAllServiceDescriptionMethod(OpcUaClient client, String folderName) {

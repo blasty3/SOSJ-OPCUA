@@ -14,6 +14,7 @@
 package systemj.common.opcua_milo;
 
 import java.lang.reflect.Array;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -134,6 +135,9 @@ public class SOSJOPCServerNamespace implements Namespace {
 
     private final OpcUaServer server;
     private final UShort namespaceIndex;
+    
+    private Hashtable NodeVariableRepo = new Hashtable();
+    private final static Object NodeVariableRepoLock = new Object();
 
     
     //Creating the Namespace with name. 
@@ -362,7 +366,7 @@ public class SOSJOPCServerNamespace implements Namespace {
             NodeId typeId = Identifiers.String;
             Variant variant = new Variant("");
 
-            UaVariableNode node = new UaVariableNode.UaVariableNodeBuilder(server.getNodeMap())
+            UaVariableNode GSRAddrNode = new UaVariableNode.UaVariableNodeBuilder(server.getNodeMap())
                 .setNodeId(new NodeId(namespaceIndex, folderName+"/GSR/"+name))
                 .setAccessLevel(ubyte(AccessLevel.getMask(AccessLevel.READ_WRITE)))
                 .setBrowseName(new QualifiedName(namespaceIndex, name))
@@ -371,7 +375,7 @@ public class SOSJOPCServerNamespace implements Namespace {
                 .setTypeDefinition(Identifiers.BaseDataVariableType)
                 .build();
 
-            node.setValue(new DataValue(variant));
+            GSRAddrNode.setValue(new DataValue(variant));
 
             /*
             AttributeDelegate delegate = AttributeDelegateChain.create(
@@ -384,12 +388,14 @@ public class SOSJOPCServerNamespace implements Namespace {
                 ValueLoggingDelegate::new
             );
             */
-            node.setAttributeDelegate(new ValueLoggingDelegate());
+            GSRAddrNode.setAttributeDelegate(new ValueLoggingDelegate());
             
            // node.setAttributeDelegate(delegate);
 
-            server.getNodeMap().addNode(node);
-            dynamicFolder.addOrganizes(node);
+            server.getNodeMap().addNode(GSRAddrNode);
+            dynamicFolder.addOrganizes(GSRAddrNode);
+            
+            AddNodeObjToStorage("GSR_ADDR", GSRAddrNode);
         }
         
         // Dynamic portnum
@@ -398,7 +404,7 @@ public class SOSJOPCServerNamespace implements Namespace {
             NodeId typeId = Identifiers.String;
             Variant variant = new Variant("");
 
-            UaVariableNode node = new UaVariableNode.UaVariableNodeBuilder(server.getNodeMap())
+            UaVariableNode GSRPortNode = new UaVariableNode.UaVariableNodeBuilder(server.getNodeMap())
                 .setNodeId(new NodeId(namespaceIndex, folderName+"/GSR/"+name))
                 .setAccessLevel(ubyte(AccessLevel.getMask(AccessLevel.READ_WRITE)))
                 .setBrowseName(new QualifiedName(namespaceIndex, name))
@@ -407,7 +413,7 @@ public class SOSJOPCServerNamespace implements Namespace {
                 .setTypeDefinition(Identifiers.BaseDataVariableType)
                 .build();
 
-            node.setValue(new DataValue(variant));
+            GSRPortNode.setValue(new DataValue(variant));
 
             /*
             AttributeDelegate delegate = AttributeDelegateChain.create(
@@ -420,12 +426,14 @@ public class SOSJOPCServerNamespace implements Namespace {
                 ValueLoggingDelegate::new
             );
             */
-            node.setAttributeDelegate(new ValueLoggingDelegate());
+            GSRPortNode.setAttributeDelegate(new ValueLoggingDelegate());
             
            // node.setAttributeDelegate(delegate);
 
-            server.getNodeMap().addNode(node);
-            dynamicFolder.addOrganizes(node);
+            server.getNodeMap().addNode(GSRPortNode);
+            dynamicFolder.addOrganizes(GSRPortNode);
+            
+            AddNodeObjToStorage("GSR_PORT", GSRPortNode);
         }
     }
     
@@ -619,6 +627,18 @@ public class SOSJOPCServerNamespace implements Namespace {
                 return Optional.empty();
             }
         });
+    }
+    
+    public void AddNodeObjToStorage(String nodeSignalName, UaVariableNode node) {
+    	synchronized(NodeVariableRepoLock) {
+    		NodeVariableRepo.put(nodeSignalName, node);
+    	}
+    }
+    
+    public UaVariableNode GetNodeObjFromStorage(String nodeSignalName) {
+    	synchronized(NodeVariableRepoLock) {
+    		return (UaVariableNode) NodeVariableRepo.get(nodeSignalName);
+    	}
     }
 
 }

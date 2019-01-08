@@ -17,17 +17,27 @@ public class SOSJSignalOPCUAReadSharedVariables {
 		}
 	}
 	
+	public static boolean CheckForSignalToRead(String signalName) {
+		synchronized(SOSJSignalsCommLock) {
+			if(SOSJSignalsComm.containsKey(signalName+":Status")) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+	
 	public static boolean GetSignalStatusToRead(String signalName) {
 		synchronized(SOSJSignalsCommLock) {
 			 boolean status = ((boolean) SOSJSignalsComm.get(signalName+":Status"));
-			 SOSJSignalsComm.put(signalName+":Status", Boolean.FALSE);
+			 SOSJSignalsComm.put(signalName+":Status", false);
 			 return status;
 		}
 	}
 	
 	public static void ResetSignalStatus(String signalName) {
 		synchronized(SOSJSignalsCommLock) {
-			SOSJSignalsComm.put(signalName+":Status", Boolean.FALSE);
+			SOSJSignalsComm.put(signalName+":Status", false);
 		}
 	}
 	
