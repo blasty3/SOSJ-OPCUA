@@ -40,7 +40,7 @@ public class InvokeGetServiceDescription implements ClientTemplateSS {
 
 	String GSR_Addr_To_Write = "";
 	
-	public void SetGSRValue(String GSR_Addr) {
+	public void SetGSRAddr(String GSR_Addr) {
 		this.GSR_Addr_To_Write = GSR_Addr;
 	}
 	
