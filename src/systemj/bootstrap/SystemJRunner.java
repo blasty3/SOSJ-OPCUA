@@ -101,6 +101,8 @@ public class SystemJRunner
         
         public static String GSR_ADDR="127.0.0.1";
         public static int GSR_PORT=4841;
+        public static String LDS_ADDR_FOR_GSR="127.0.0.1";
+        public static int LDS_PORT_FOR_GSR=4840;
         
 	
 	private static void printInfo(){
@@ -376,6 +378,8 @@ public class SystemJRunner
                                     } else {
                                     GSR_ADDR = args[i+1];
                                     GSR_PORT = Integer.parseInt(args[i+2]);
+                                    LDS_ADDR_FOR_GSR = args[i+3];
+                                    LDS_PORT_FOR_GSR = Integer.parseInt(args[i+4]);
                                     
                                     //SubnetMask = args[i+2];
                                     //SSName = args[i+2];
@@ -830,8 +834,8 @@ public class SystemJRunner
     				FindServersClient findServCl = new FindServersClient();
     				
     				try {
-    					  findServCl.outputFindServersOnNetwork("opc.tcp://"+LDS_ADDR+":4840/discovery")
-    					      .thenCompose(aVoid -> findServCl.outputFindServers("opc.tcp://"+LDS_ADDR+":4840/discovery"))
+    					  findServCl.outputFindServersOnNetwork("opc.tcp://"+LDS_ADDR_FOR_GSR+":"+LDS_PORT_FOR_GSR+"/discovery")
+    					      .thenCompose(aVoid -> findServCl.outputFindServers("opc.tcp://"+LDS_ADDR_FOR_GSR+":"+LDS_PORT_FOR_GSR+"/discovery"))
     					.get();
     					
     					if(!SJServiceRegistry.IsNewServersListEmpty()) {
@@ -851,7 +855,7 @@ public class SystemJRunner
     							InvokeGetServiceDescription invGetServ = new InvokeGetServiceDescription();
     							
     							try {
-    								invGetServ.SetGSRValue(GSR_ADDR);
+    								invGetServ.SetGSRAddr(GSR_ADDR);
 									invGetServ.execute(addr, port, ssName);
 								} catch (Exception e) {
 									// TODO Auto-generated catch block
