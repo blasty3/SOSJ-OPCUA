@@ -21,7 +21,7 @@ public class RemoteMethodInvocOPCUASender extends GenericSignalSender{
 		InvokeGetAllServiceDescriptionFromGSR invGetAllServ = new InvokeGetAllServiceDescriptionFromGSR();
 		
 		try {
-			invGetServ.SetGSRValue(GSR_ADDR);
+			invGetAllServ.SetGSRValue(GSR_Addr);(GSR_ADDR);
 			invGetServ.execute(addr, port, ssName);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

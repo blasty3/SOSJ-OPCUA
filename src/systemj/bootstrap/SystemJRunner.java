@@ -856,6 +856,7 @@ public class SystemJRunner
     							
     							try {
     								invGetServ.SetGSRAddr(GSR_ADDR);
+    								invGetServ.SetGSRPort(GSR_PORT);
 									invGetServ.execute(addr, port, ssName);
 								} catch (Exception e) {
 									// TODO Auto-generated catch block

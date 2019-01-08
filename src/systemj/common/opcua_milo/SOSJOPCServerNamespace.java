@@ -391,6 +391,42 @@ public class SOSJOPCServerNamespace implements Namespace {
             server.getNodeMap().addNode(node);
             dynamicFolder.addOrganizes(node);
         }
+        
+        // Dynamic portnum
+        {
+            String name = "GSR_PORT";
+            NodeId typeId = Identifiers.String;
+            Variant variant = new Variant("");
+
+            UaVariableNode node = new UaVariableNode.UaVariableNodeBuilder(server.getNodeMap())
+                .setNodeId(new NodeId(namespaceIndex, folderName+"/GSR/"+name))
+                .setAccessLevel(ubyte(AccessLevel.getMask(AccessLevel.READ_WRITE)))
+                .setBrowseName(new QualifiedName(namespaceIndex, name))
+                .setDisplayName(LocalizedText.english(name))
+                .setDataType(typeId)
+                .setTypeDefinition(Identifiers.BaseDataVariableType)
+                .build();
+
+            node.setValue(new DataValue(variant));
+
+            /*
+            AttributeDelegate delegate = AttributeDelegateChain.create(
+                new AttributeDelegate() {
+                    @Override
+                    public DataValue getValue(AttributeContext context, VariableNode node) throws UaException {
+                        return new DataValue(new Variant(random.nextDouble()));
+                    }
+                },
+                ValueLoggingDelegate::new
+            );
+            */
+            node.setAttributeDelegate(new ValueLoggingDelegate());
+            
+           // node.setAttributeDelegate(delegate);
+
+            server.getNodeMap().addNode(node);
+            dynamicFolder.addOrganizes(node);
+        }
     }
     
     /*

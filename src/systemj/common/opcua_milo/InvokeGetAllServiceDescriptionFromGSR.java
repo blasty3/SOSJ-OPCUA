@@ -39,6 +39,7 @@ import static org.eclipse.milo.opcua.stack.core.util.ConversionUtil.l;
 public class InvokeGetAllServiceDescriptionFromGSR implements ClientTemplateSS {
 
 	String GSR_Addr_To_Write = "";
+	String
 	
 	public void SetGSRValue(String GSR_Addr) {
 		this.GSR_Addr_To_Write = GSR_Addr;

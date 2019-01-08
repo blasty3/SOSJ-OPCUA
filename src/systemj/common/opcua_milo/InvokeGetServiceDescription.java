@@ -39,9 +39,14 @@ import static org.eclipse.milo.opcua.stack.core.util.ConversionUtil.l;
 public class InvokeGetServiceDescription implements ClientTemplateSS {
 
 	String GSR_Addr_To_Write = "";
+	int GSR_Port_To_Write = 4842;
 	
 	public void SetGSRAddr(String GSR_Addr) {
 		this.GSR_Addr_To_Write = GSR_Addr;
+	}
+	
+	public void SetGSRPort(int GSR_Port) {
+		this.GSR_Port_To_Write = GSR_Port;
 	}
 	
 	public void execute(String Addr, int port, String name) throws Exception {
@@ -79,6 +84,27 @@ public class InvokeGetServiceDescription implements ClientTemplateSS {
 
         if (statusGSRAddr.isGood()) {
             logger.info("Wrote '{}' to nodeId={}", vStatus, nodeIdsGSRAddr.get(0));
+        }
+        
+        //write GSR port
+        
+        List<NodeId> nodeIdsGSRPort = ImmutableList.of(new NodeId(2, name+"/GSR/GSR_PORT"));
+        
+		Variant vPort = new Variant(Integer.toString(GSR_Port_To_Write));
+		
+		 // don't write status or timestamps
+        DataValue dvPort = new DataValue(vPort, null, null);
+
+        // write asynchronously....
+        CompletableFuture<List<StatusCode>> fGSRPort =
+            client.writeValues(nodeIdsGSRPort, ImmutableList.of(dvPort));
+
+        // ...but block for the results so we write in order
+        List<StatusCode> statusCodesGSRPort = fGSRPort.get();
+        StatusCode statusGSRPort = statusCodesGSRPort.get(0);
+
+        if (statusGSRAddr.isGood()) {
+            logger.info("Wrote '{}' to nodeId={}", vPort, nodeIdsGSRPort.get(0));
         }
         
         
