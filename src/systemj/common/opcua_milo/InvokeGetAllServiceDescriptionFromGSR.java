@@ -36,7 +36,7 @@ import systemj.common.SJServiceRegistry;
 
 import static org.eclipse.milo.opcua.stack.core.util.ConversionUtil.l;
 
-public class InvokeGetServiceDescription implements ClientTemplateSS {
+public class InvokeGetAllServiceDescriptionFromGSR implements ClientTemplateSS {
 
 	String GSR_Addr_To_Write = "";
 	
@@ -46,7 +46,7 @@ public class InvokeGetServiceDescription implements ClientTemplateSS {
 	
 	public void execute(String Addr, int port, String name) throws Exception {
     //public static void main(String[] args) throws Exception {
-    	InvokeGetServiceDescription example = new InvokeGetServiceDescription();
+    	InvokeGetAllServiceDescriptionFromGSR example = new InvokeGetAllServiceDescriptionFromGSR();
 
         new ClientRequestServiceDescriptionRunner(example, Addr, port, name).run();
     //}
@@ -59,35 +59,12 @@ public class InvokeGetServiceDescription implements ClientTemplateSS {
         // synchronous connect
         client.connect().get();
         
-        
-        // write GSR addr
-        
-        List<NodeId> nodeIdsGSRAddr = ImmutableList.of(new NodeId(2, name+"/GSR/GSR_ADDR"));
-        
-		Variant vStatus = new Variant(GSR_Addr_To_Write);
-		
-		 // don't write status or timestamps
-        DataValue dvStatus = new DataValue(vStatus, null, null);
-
-        // write asynchronously....
-        CompletableFuture<List<StatusCode>> fGSRAddr =
-            client.writeValues(nodeIdsGSRAddr, ImmutableList.of(dvStatus));
-
-        // ...but block for the results so we write in order
-        List<StatusCode> statusCodesGSRAddr = fGSRAddr.get();
-        StatusCode statusGSRAddr = statusCodesGSRAddr.get(0);
-
-        if (statusGSRAddr.isGood()) {
-            logger.info("Wrote '{}' to nodeId={}", vStatus, nodeIdsGSRAddr.get(0));
-        }
-        
-        
         // call the GetServiceDescription() function
-        InvokeGetServiceDescriptionMethod(client, name).exceptionally(ex -> {
+        InvokeGetAllServiceDescriptionMethod(client, name).exceptionally(ex -> {
             logger.error("error invoking GetServiceDescription", ex);
             return "{}";
         }).thenAccept(res -> {
-            logger.info("GetServiceDescription={}", res);
+            logger.info("GetAllServiceDescription={}", res);
             try {
             	JSONObject jsRes = new JSONObject(new JSONTokener(res));
 				SJServiceRegistry.AddServicesToGSR(jsRes);
@@ -95,13 +72,23 @@ public class InvokeGetServiceDescription implements ClientTemplateSS {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+            
+            try {
+				client.disconnect().get();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
             future.complete(client);
         });
     }
 
-    private CompletableFuture<String> InvokeGetServiceDescriptionMethod(OpcUaClient client, String folderName) {
+    private CompletableFuture<String> InvokeGetAllServiceDescriptionMethod(OpcUaClient client, String folderName) {
         NodeId objectId = NodeId.parse("ns=2;s=" +folderName);
-        NodeId methodId = NodeId.parse("ns=2;s=" +folderName+"/getServiceDescription()");
+        NodeId methodId = NodeId.parse("ns=2;s=" +folderName+"/getAllServiceDescription()");
 
         CallMethodRequest request = new CallMethodRequest(
             objectId, methodId, new Variant[]{new Variant("")});

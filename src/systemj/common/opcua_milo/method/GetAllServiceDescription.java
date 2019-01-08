@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import systemj.common.SJServiceRegistry;
 
-public class GetServiceDescription {
+public class GetAllServiceDescription {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -40,8 +40,8 @@ public class GetServiceDescription {
         @UaOutputArgument(
            // name = "x_sqrt",
             //description = "The positive square root of x. If the argument is NaN or less than zero, the result is NaN."
-            name = "GetServiceDescription",
-        	description = "Obtain service description of all services"	
+            name = "GetAllServiceDescription",
+        	description = "Obtain service description of all services in SOSJ GSR"	
         	)
             //Out<Double> xSqrt
         	Out<String> serviceDescription
@@ -53,9 +53,9 @@ public class GetServiceDescription {
         //logger.debug("Invoking sqrt() method of Object '{}'", context.getObjectNode().getBrowseName().getName());
     	
     	try {
-    		System.out.println("GetServiceDescription()");
-    		logger.debug("Invoking GetServiceDescription() method of Object '{}'", context.getObjectNode().getBrowseName().getName());
-			serviceDescription.set(SJServiceRegistry.obtainInternalRegistryForSOSJOPCUAGSR().toString());
+    		System.out.println("GetAllServiceDescription()");
+    		logger.debug("Invoking GetAllServiceDescription() method of Object '{}'", context.getObjectNode().getBrowseName().getName());
+			serviceDescription.set(SJServiceRegistry.obtainCurrentRegistry().toString());
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

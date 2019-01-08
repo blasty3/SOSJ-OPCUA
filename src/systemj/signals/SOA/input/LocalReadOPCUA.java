@@ -127,8 +127,9 @@ public class LocalReadOPCUA extends GenericSignalReceiver{
         
         if(IsRead) {
         	signalStatusNode.setValue(new DataValue(new Variant(false)));
-        	sosjnamespace.AddNodeObjToStorage(NameToRead+":Status", signalStatusNode);
         	super.setIsRead(false);
+        	sosjnamespace.AddNodeObjToStorage(NameToRead+":Status", signalStatusNode);
+        	
         } 
 		
 	}

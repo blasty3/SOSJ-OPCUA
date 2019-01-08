@@ -43,7 +43,32 @@ public class SJServiceRegistry {
         //if (IsInternalServ){
             
             synchronized (CurrentRegistryLock){
+            	
                 currentServiceRegistry.put(SJSSCDSignalChannelMap.getLocalSSName(),js);
+            }
+          
+        //} 
+    }
+    
+    public static void AddServicesToGSR(JSONObject js) throws JSONException{
+        
+        //if (IsInternalServ){
+            
+            synchronized (CurrentRegistryLock){
+            	
+            	Enumeration jsKeys = js.keys();
+            	
+            	while(jsKeys.hasMoreElements()) {
+            		
+            		String ssNameOfDesc = jsKeys.nextElement().toString();
+            		
+            		JSONObject jsServDesc = js.getJSONObject(ssNameOfDesc);
+            		
+            		currentServiceRegistry.put(ssNameOfDesc, jsServDesc);
+            		
+            	}
+            	
+                //currentServiceRegistry.put(,js);
             }
           
         //} 
@@ -344,6 +369,30 @@ public class SJServiceRegistry {
             
             synchronized (CurrentRegistryLock){
                 intReg= currentServiceRegistry.getJSONObject(SJSSCDSignalChannelMap.getLocalSSName());
+            }
+            
+            //System.out.println("SJServiceRegistry Current Registry: " +currentDetailedServiceRegistry.toPrettyPrintedString(2, 0));
+            return intReg;
+        } else {
+            return new JSONObject();
+        } 
+    }
+    
+    public static JSONObject obtainInternalRegistryForSOSJOPCUAGSR() throws JSONException{
+        
+        JSONObject intReg = new JSONObject();
+        
+        //System.out.println("obtained internal Registry: " +currentDetailedServiceRegistry.getJSONObject("Node0").toPrettyPrintedString(2, 0));
+        if (!currentServiceRegistry.toString().equalsIgnoreCase("{}")){
+            
+            synchronized (CurrentRegistryLock){
+            	
+            	String ssName = SJSSCDSignalChannelMap.getLocalSSName();
+            	JSONObject jsAllServ = currentServiceRegistry.getJSONObject(SJSSCDSignalChannelMap.getLocalSSName());
+            	
+            	intReg.put(ssName,jsAllServ);
+            	
+                //intReg= currentServiceRegistry.getJSONObject(SJSSCDSignalChannelMap.getLocalSSName());
             }
             
             //System.out.println("SJServiceRegistry Current Registry: " +currentDetailedServiceRegistry.toPrettyPrintedString(2, 0));

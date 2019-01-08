@@ -63,7 +63,7 @@ public class ClientRequestServiceDescriptionRunner {
         SecurityPolicy securityPolicy = clientExample.getSecurityPolicy();
 
         //EndpointDescription[] endpoints = UaTcpStackClient.getEndpoints("opc.tcp://localhost:12686/example").get();
-        EndpointDescription[] endpoints = UaTcpStackClient.getEndpoints("opc.tcp://"+Addr+":"+port).get();
+        EndpointDescription[] endpoints = UaTcpStackClient.getEndpoints("opc.tcp://"+Addr+":"+port+"/"+name).get();
 
         EndpointDescription endpoint = Arrays.stream(endpoints)
             .filter(e -> e.getSecurityPolicyUri().equals(securityPolicy.getSecurityPolicyUri()))
@@ -91,8 +91,10 @@ public class ClientRequestServiceDescriptionRunner {
             if (client != null) {
                 try {
                     client.disconnect().get();
+                    
+                    
                     //exampleServer.shutdown().get();
-                    Stack.releaseSharedResources();
+                    //Stack.releaseSharedResources();
                 } catch (InterruptedException | ExecutionException e) {
                     logger.error("Error disconnecting:", e.getMessage(), e);
                 }

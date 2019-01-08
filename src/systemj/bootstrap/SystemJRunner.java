@@ -32,10 +32,14 @@ import systemj.common.SOAFacility.RegSender;
 //import systemj.common.SOAFacility.RegRemoteDiscMessageReceiverThread;
 //import systemj.common.SOAFacility.RegRemoteMessageReceiverThread;
 import systemj.common.SOAFacility.Support.SOABuffer;
+import systemj.common.opcua_milo.ClientExampleGSRWrite;
 import systemj.common.opcua_milo.ClientRequestServiceDescriptionRunner;
+import systemj.common.opcua_milo.ClientRunner;
 import systemj.common.opcua_milo.FindServersClient;
 import systemj.common.opcua_milo.InvokeGetServiceDescription;
+import systemj.common.opcua_milo.MiloServerSOSJGSRHandler;
 import systemj.common.opcua_milo.MiloServerSSHandler;
+import systemj.common.opcua_milo.SOSJLocalDiscoveryServer;
 import systemj.desktop.JdomParser;
 
 import java.util.concurrent.CompletableFuture;
@@ -72,6 +76,8 @@ public class SystemJRunner
         private static boolean IsSPOTRemoteSOA = false;
         
         private static boolean IsSOSJOPCUA = false;
+        private static boolean IsSOSJOPCUAGSR = false;
+        
         private static boolean IsSOSJOPCUALDS = false;
         
         private static boolean IsSOSJOPCUATest = false;
@@ -89,7 +95,12 @@ public class SystemJRunner
         
         private static ScheduledExecutorService periodicFindServerQueryExec;
         
-        public static String LDS_ADDR="localhost";
+        public static String LDS_ADDR="127.0.0.1";
+        public static int LDS_PORT=4840;
+        
+        
+        public static String GSR_ADDR="127.0.0.1";
+        public static int GSR_PORT=4841;
         
 	
 	private static void printInfo(){
@@ -355,7 +366,30 @@ public class SystemJRunner
                                 }
                             
                         }
-                        else if(args[i].equals("-sosjopcualds")){
+                        else if(args[i].equals("-sosjopcuagsr")){
+                        	IsSOSJOPCUAGSR = true;
+                            
+                            if(args.length>i+1){
+                                    if(args[i+1].equalsIgnoreCase("help")){
+                                        printSOSJNoCDUsage();
+                                        System.exit(1);
+                                    } else {
+                                    GSR_ADDR = args[i+1];
+                                    GSR_PORT = Integer.parseInt(args[i+2]);
+                                    
+                                    //SubnetMask = args[i+2];
+                                    //SSName = args[i+2];
+                                    //System.out.println("SS name: " +SSName);
+                                    //SOABuffer.AddEmptySSName(SSName);
+                                    //SJSSCDSignalChannelMap.addLocalSSName(SSName);
+                                    break;
+                                 }
+                                } else {
+                                    printSOSJNoCDUsage();
+                                    System.exit(1);
+                                }
+                            
+                        } else if(args[i].equals("-sosjopcualds")){
                         	IsSOSJOPCUALDS = true;
                             
                             if(args.length>i+1){
@@ -364,6 +398,8 @@ public class SystemJRunner
                                         System.exit(1);
                                     } else {
                                     LDS_ADDR = args[i+1];
+                                    LDS_PORT = Integer.parseInt(args[i+2]);
+                                    
                                     //SubnetMask = args[i+2];
                                     //SSName = args[i+2];
                                     //System.out.println("SS name: " +SSName);
@@ -489,6 +525,15 @@ public class SystemJRunner
                 setSubnetMaskAddr();
                 setRegAdvExpiryTime();
                 StartSOARegThread();
+            } else if(IsSOSJOPCUAGSR){
+                setGatewayAddr();
+                //setSubnetMaskAddr();
+                setSOSJRegAddr();
+                setSOSJRegID();
+                setGatewayAddr();
+                setSubnetMaskAddr();
+                StartOPCUA_GSR();
+            
             } else if(IsSOSJOPCUALDS){
                 setGatewayAddr();
                 //setSubnetMaskAddr();
@@ -496,7 +541,7 @@ public class SystemJRunner
                 setSOSJRegID();
                 setGatewayAddr();
                 setSubnetMaskAddr();
-                StartOPC_UA_LDS();
+                StartOPCUA_LDS();
             
             } else if(IsSOSJOPCUATest) {
             	
@@ -733,11 +778,44 @@ public class SystemJRunner
             
         }
         
-        private static void StartOPC_UA_LDS(){
-        	Thread locregmsgreceiver = new Thread(new RegReceiver());
-        	Thread regmsgsender = new Thread(new RegSender());
+        private static void StartOPCUA_LDS(){
+        	
+        	try {
+				SOSJLocalDiscoveryServer sosjlds = new SOSJLocalDiscoveryServer(LDS_ADDR, LDS_PORT);
+				sosjlds.startup().get();
+				final CompletableFuture<Void> future = new CompletableFuture<>();
+
+		        Runtime.getRuntime().addShutdownHook(new Thread(() -> sosjlds.shutdown().thenRun(() -> future.complete(null))));
+
+		        //future.get();
+        	} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        	
+        }
+        
+        private static void StartOPCUA_GSR(){
+        	//Thread locregmsgreceiver = new Thread(new RegReceiver());
+        	//Thread regmsgsender = new Thread(new RegSender());
         	
         	//need to start timer to regularly trigger FindServer in LDS
+        	
+        	//start a server to serve Discovery
+        	
+        	try {
+				MiloServerSOSJGSRHandler milo_serv_gsr = new MiloServerSOSJGSRHandler(GSR_ADDR, GSR_PORT);
+				milo_serv_gsr.startup();
+				
+				final CompletableFuture<Void> future = new CompletableFuture<>();
+     	        Runtime.getRuntime().addShutdownHook(new Thread(() -> milo_serv_gsr.getServer().shutdown().thenRun(() -> future.complete(null))));
+				
+				
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        	
         	
         	periodicFindServerQueryExec = Executors.newScheduledThreadPool(2);
         	
@@ -764,13 +842,16 @@ public class SystemJRunner
     							String uri = allNewServersList.get(i).toString();
     							String[] uriParts = uri.split(":");
     							
-    							String ssName = uriParts[5];
-    							String addr = uriParts[6];
-    							int port = Integer.parseInt(uriParts[7]);
+    							String ssName = uriParts[4];
+    							String addr = uriParts[5];
+    							int port = Integer.parseInt(uriParts[6]);
+    							
+    							//modify the GSR_ADDR variable in SS handler
     							
     							InvokeGetServiceDescription invGetServ = new InvokeGetServiceDescription();
     							
     							try {
+    								invGetServ.SetGSRValue(GSR_ADDR);
 									invGetServ.execute(addr, port, ssName);
 								} catch (Exception e) {
 									// TODO Auto-generated catch block

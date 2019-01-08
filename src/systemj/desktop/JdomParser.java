@@ -507,13 +507,13 @@ public void parseSubSystem(Element subsystem, InterfaceManager im){
      			 * original
      			 * 
      			 */
-     			//milo_server_h.startup(DiscServAddr).get();
+     			milo_server_h.startup(DiscServAddr).get();
      			
      			/*
      			 * test
      			 * 
      			 */
-     			milo_server_h.startupWithoutLDS().get();
+     			//milo_server_h.startupWithoutLDS().get();
      	        
      	        OPCUAClientServerObjRepo.AddServerObjSS(ssname, milo_server_h);
      	        //final CompletableFuture<Void> future = new CompletableFuture<>();

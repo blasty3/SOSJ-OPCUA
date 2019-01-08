@@ -168,7 +168,7 @@ public class SOSJOPCServerNamespace implements Namespace {
             );
 
             // Add the rest of the nodes
-            addVariableNodes(folderNode);
+            //addVariableNodes(folderNode);
 
             //addMethodNode(folderNode);
             
@@ -346,22 +346,24 @@ public class SOSJOPCServerNamespace implements Namespace {
     private void addDynamicNodes(UaFolderNode rootNode) {
         UaFolderNode dynamicFolder = new UaFolderNode(
             server.getNodeMap(),
-            new NodeId(namespaceIndex, folderName+"/Dynamic"),
-            new QualifiedName(namespaceIndex, "Dynamic"),
+            new NodeId(namespaceIndex, folderName+"/GSR"),
+            new QualifiedName(namespaceIndex, "GSR"),
             LocalizedText.english("Dynamic")
         );
 
         server.getNodeMap().addNode(dynamicFolder);
         rootNode.addOrganizes(dynamicFolder);
 
-        // Dynamic Boolean
+        
+
+        // Dynamic String
         {
-            String name = "Boolean";
-            NodeId typeId = Identifiers.Boolean;
-            Variant variant = new Variant(false);
+            String name = "GSR_ADDR";
+            NodeId typeId = Identifiers.String;
+            Variant variant = new Variant("");
 
             UaVariableNode node = new UaVariableNode.UaVariableNodeBuilder(server.getNodeMap())
-                .setNodeId(new NodeId(namespaceIndex, folderName+"/Dynamic/" + name))
+                .setNodeId(new NodeId(namespaceIndex, folderName+"/GSR/"+name))
                 .setAccessLevel(ubyte(AccessLevel.getMask(AccessLevel.READ_WRITE)))
                 .setBrowseName(new QualifiedName(namespaceIndex, name))
                 .setDisplayName(LocalizedText.english(name))
@@ -371,72 +373,7 @@ public class SOSJOPCServerNamespace implements Namespace {
 
             node.setValue(new DataValue(variant));
 
-            AttributeDelegate delegate = AttributeDelegateChain.create(
-                new AttributeDelegate() {
-                    @Override
-                    public DataValue getValue(AttributeContext context, VariableNode node) throws UaException {
-                        return new DataValue(new Variant(random.nextBoolean()));
-                    }
-                },
-                ValueLoggingDelegate::new
-            );
-
-            node.setAttributeDelegate(delegate);
-
-            server.getNodeMap().addNode(node);
-            dynamicFolder.addOrganizes(node);
-        }
-
-        // Dynamic Int32
-        {
-            String name = "Int32";
-            NodeId typeId = Identifiers.Int32;
-            Variant variant = new Variant(0);
-
-            UaVariableNode node = new UaVariableNode.UaVariableNodeBuilder(server.getNodeMap())
-                .setNodeId(new NodeId(namespaceIndex, folderName+"/Dynamic/" + name))
-                .setAccessLevel(ubyte(AccessLevel.getMask(AccessLevel.READ_WRITE)))
-                .setBrowseName(new QualifiedName(namespaceIndex, name))
-                .setDisplayName(LocalizedText.english(name))
-                .setDataType(typeId)
-                .setTypeDefinition(Identifiers.BaseDataVariableType)
-                .build();
-
-            node.setValue(new DataValue(variant));
-
-            AttributeDelegate delegate = AttributeDelegateChain.create(
-                new AttributeDelegate() {
-                    @Override
-                    public DataValue getValue(AttributeContext context, VariableNode node) throws UaException {
-                        return new DataValue(new Variant(random.nextInt()));
-                    }
-                },
-                ValueLoggingDelegate::new
-            );
-
-            node.setAttributeDelegate(delegate);
-
-            server.getNodeMap().addNode(node);
-            dynamicFolder.addOrganizes(node);
-        }
-
-        // Dynamic Double
-        {
-            String name = "Double";
-            NodeId typeId = Identifiers.Double;
-            Variant variant = new Variant(0.0);
-
-            UaVariableNode node = new UaVariableNode.UaVariableNodeBuilder(server.getNodeMap())
-                .setNodeId(new NodeId(namespaceIndex, folderName+"/Dynamic/" + name))
-                .setAccessLevel(ubyte(AccessLevel.getMask(AccessLevel.READ_WRITE)))
-                .setBrowseName(new QualifiedName(namespaceIndex, name))
-                .setDisplayName(LocalizedText.english(name))
-                .setDataType(typeId)
-                .setTypeDefinition(Identifiers.BaseDataVariableType)
-                .build();
-
-            node.setValue(new DataValue(variant));
-
+            /*
             AttributeDelegate delegate = AttributeDelegateChain.create(
                 new AttributeDelegate() {
                     @Override
@@ -446,8 +383,10 @@ public class SOSJOPCServerNamespace implements Namespace {
                 },
                 ValueLoggingDelegate::new
             );
-
-            node.setAttributeDelegate(delegate);
+            */
+            node.setAttributeDelegate(new ValueLoggingDelegate());
+            
+           // node.setAttributeDelegate(delegate);
 
             server.getNodeMap().addNode(node);
             dynamicFolder.addOrganizes(node);
