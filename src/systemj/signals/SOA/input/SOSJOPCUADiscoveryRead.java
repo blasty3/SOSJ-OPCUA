@@ -12,9 +12,17 @@ import systemj.interfaces.GenericSignalReceiver;
 
 public class SOSJOPCUADiscoveryRead extends GenericSignalReceiver{
 
+	private String cdName;
+	
 	@Override
 	public void configure(Hashtable data) throws RuntimeException {
 		// TODO Auto-generated method stub
+		
+		if(data.containsKey("CDName")){
+            cdName = (String)data.get("CDName");
+        } else {
+            throw new RuntimeException("the 'CDName' attribute is required");
+        }
 		
 	}
 
@@ -29,14 +37,13 @@ public class SOSJOPCUADiscoveryRead extends GenericSignalReceiver{
 		// TODO Auto-generated method stub
 		Object[] obj = new Object[2];
 		
-		boolean signalExist = SOSJSignalOPCUAReadSharedVariables.CheckForSignalToRead("SOSJOPCUADisc");
+		boolean signalExist = SOSJSignalOPCUAReadSharedVariables.CheckForSignalToRead(cdName+":SOSJOPCUADisc");
 		
 		if(signalExist) {
 			
-			boolean signalStatus = SOSJSignalOPCUAReadSharedVariables.GetSignalStatusToRead("SOSJOPCUADisc");
+			boolean signalStatus = SOSJSignalOPCUAReadSharedVariables.GetSignalStatusToRead(cdName+":SOSJOPCUADisc");
 			
 			if(signalStatus) {
-				
 				
 				try {
 					String jsServDesc = SJServiceRegistry.obtainCurrentRegistry().toString();

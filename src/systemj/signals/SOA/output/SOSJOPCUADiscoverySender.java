@@ -18,12 +18,21 @@ import systemj.interfaces.GenericSignalSender;
 public class SOSJOPCUADiscoverySender extends GenericSignalSender{
 
 	private String ssName;
+	private String cdName;
 	
 	 UShort ush = Unsigned.ushort(2);
 	
 	@Override
 	public void configure(Hashtable data) throws RuntimeException {
 		// TODO Auto-generated method stub
+		
+		
+		
+		if(data.containsKey("CDName")){
+            cdName = (String)data.get("CDName");
+        } else {
+            throw new RuntimeException("the 'CDName' attribute is required");
+        }
 		
 		if(data.containsKey("SSName")){
             ssName = (String)data.get("SSName");
@@ -54,7 +63,7 @@ public class SOSJOPCUADiscoverySender extends GenericSignalSender{
 		
 		try {
 			
-			invGetAllServ.execute(GSRAddr, GSRPort, "Params");
+			invGetAllServ.execute(cdName,GSRAddr, GSRPort, "Params");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

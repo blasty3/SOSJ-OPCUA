@@ -38,11 +38,13 @@ import static org.eclipse.milo.opcua.stack.core.util.ConversionUtil.l;
 
 public class InvokeGetAllServiceDescriptionFromGSR implements ClientTemplateSS {
 
+	private String cdName = "";
 	
-	
-	public void execute(String Addr, int port, String name) throws Exception {
+	public void execute(String cdName, String Addr, int port, String name) throws Exception {
     //public static void main(String[] args) throws Exception {
-    	InvokeGetAllServiceDescriptionFromGSR example = new InvokeGetAllServiceDescriptionFromGSR();
+    	this.cdName = cdName;
+		
+		InvokeGetAllServiceDescriptionFromGSR example = new InvokeGetAllServiceDescriptionFromGSR();
 
         new ClientRequestServiceDescriptionRunner(example, Addr, port, name).run();
     //}
@@ -64,7 +66,7 @@ public class InvokeGetAllServiceDescriptionFromGSR implements ClientTemplateSS {
             try {
             	JSONObject jsRes = new JSONObject(new JSONTokener(res));
 				SJServiceRegistry.AddServicesToGSR(jsRes);
-				SOSJSignalOPCUAReadSharedVariables.AddForSignalsToRead("SOSJOPCUADisc", true, "");
+				SOSJSignalOPCUAReadSharedVariables.AddForSignalsToRead(cdName+":SOSJOPCUADisc", true, "");
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
